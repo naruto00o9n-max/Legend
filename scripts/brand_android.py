@@ -19,6 +19,8 @@ def brand(decoded):
         text=text.replace('in YTyper','in Cookies Editor').replace('to YTyper','to Cookies Editor').replace('of YTyper','of Cookies Editor')
         text=text.replace('في YTyper','في Cookies Editor').replace('بك في YTyper','بك في Cookies Editor').replace('من YTyper','من Cookies Editor')
         text=text.replace('android:text="YTyper"','android:text="Cookies Editor"')
+        if file.relative_to(decoded).as_posix()=='res/values/strings.xml':
+            text=re.sub(r'(<string name="status_login_prompt">).*?(</string>)',r'\1يرجى تسجيل الدخول للمتابعة.\2',text)
         text=re.sub(r'(?i)#(ff)?64ffda', lambda m:'#'+(m.group(1) or '')+'d4af37',text)
         if file.name=='activity_editor.xml': text=text.replace('android:text="Y"','android:text="🍪"')
         if text!=original: file.write_text(text);changed.append(str(file.relative_to(decoded)))
@@ -43,9 +45,10 @@ def brand(decoded):
             # Compose's title is not in XML resources; change display literals only.
             text=text.replace('const-string v6, "Y"','const-string v6, "🍪"')
             text=text.replace('const-string v6, "Typer"','const-string v6, "Cookies"')
-            text=text.replace('"Login with Google"','"تسجيل الدخول باستخدام Google"')
-            text=text.replace('"Please sign in to continue."','"سجّل الدخول للمتابعة."')
             text=text.replace('0xff64ffdaL','0xffd4af37L')
+        if file.as_posix().endswith('/ui/dashboard/ComposableSingletons$SplashActivityKt.smali'):
+            # This lambda draws only the sign-in button's label. Keep its action.
+            text=text.replace('"Login with Google"','"تسجيل الدخول باستخدام Google"')
         if text!=original:file.write_text(text);changed.append(str(file.relative_to(decoded)))
     for density,size,foreground in [('mdpi',48,108),('hdpi',72,162),('xhdpi',96,216),('xxhdpi',144,324),('xxxhdpi',192,432)]:
         folder=decoded/'res'/('mipmap-'+density);folder.mkdir(exist_ok=True)
