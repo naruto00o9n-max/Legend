@@ -30,6 +30,12 @@ def apply(decoded):
     replace('ui/settings/SettingsActivity','loadUserProfile()V','    .locals 0\n    invoke-static {p0}, Lcom/cookies/editor/local/OfflineBridge;->profile(Landroid/app/Activity;)V\n    return-void')
     replace('ui/settings/SettingsActivity','performSignOut()V','    .locals 0\n    invoke-static {p0}, Lcom/cookies/editor/local/OfflineBridge;->signOut(Landroid/app/Activity;)V\n    return-void')
     replace('ui/dashboard/SplashActivity','onCreate(Landroid/os/Bundle;)V','    .locals 0\n    invoke-super {p0, p1}, Landroidx/fragment/app/k0;->onCreate(Landroid/os/Bundle;)V\n    invoke-static {p0}, Lcom/cookies/editor/local/OfflineBridge;->openWelcome(Landroid/app/Activity;)V\n    return-void')
+    tutorial=source('utils/TutorialHelper');text=tutorial.read_text()
+    # The reference passes a resource name to Color.parseColor, which throws
+    # on the first assistant tutorial. Correct the literal, retaining its UI.
+    assert '"@color/grid_center_line_color"' in text
+    tutorial.write_text(text.replace('"@color/grid_center_line_color"','"#D4AF37"'))
+    changes.append({'file':str(tutorial.relative_to(decoded)),'method':'showNextStep: invalid color literal corrected'})
     for name,layout in [('ui/dashboard/StoreActivity','activity_store'),('ui/community/CommunityActivity','activity_community'),('ui/community/CreatePostActivity','activity_create_post'),('ui/dashboard/WebtoonScraperActivity','activity_webtoon_scraper')]:
         replace(name,'onCreate(Landroid/os/Bundle;)V',f'    .locals 1\n    invoke-super {{p0, p1}}, Landroidx/fragment/app/k0;->onCreate(Landroid/os/Bundle;)V\n    const-string v0, "{layout}"\n    invoke-static {{p0, v0}}, Lcom/cookies/editor/local/OfflineBridge;->servicePreview(Landroid/app/Activity;Ljava/lang/String;)V\n    return-void')
         # Original service lifecycle expects fields initialized by its online onCreate.

@@ -5,8 +5,8 @@ mkdir -p build/ui-runtime
 capture_diagnostics() {
   adb logcat -d -v threadtime > build/ui-runtime/logcat.txt 2>&1 || true
   adb exec-out screencap -p > build/ui-runtime/final-screen.png 2>/dev/null || true
-  adb pull /sdcard/Android/data/com.cookies.editor/files/cookies-ui-evidence.zip build/ui-runtime/ >/dev/null 2>&1 || true
-  adb pull /sdcard/Android/data/com.cookies.editor/files/ui-evidence build/ui-runtime/partial-evidence >/dev/null 2>&1 || true
+  adb pull /sdcard/Download/Cookies-ui/cookies-ui-evidence.zip build/ui-runtime/ >/dev/null 2>&1 || true
+  adb pull /sdcard/Download/Cookies-ui build/ui-runtime/partial-evidence >/dev/null 2>&1 || true
 }
 trap capture_diagnostics EXIT
 adb logcat -c
@@ -16,7 +16,7 @@ adb shell settings put global verifier_verify_adb_installs 0
 adb install --no-streaming -r build/cookies-reference-test.apk
 adb install --no-streaming -r build/cookies-fixtures-test.apk
 timeout 360 adb shell am instrument -w -r com.cookies.editor.fixtures/com.cookies.editor.fixtures.UiRunner > build/ui-runtime/instrumentation.txt
-adb pull /sdcard/Android/data/com.cookies.editor/files/cookies-ui-evidence.zip build/ui-runtime/
+adb pull /sdcard/Download/Cookies-ui/cookies-ui-evidence.zip build/ui-runtime/
 python3 - <<'PY'
 import json,pathlib,zipfile
 p=pathlib.Path('build/ui-runtime')

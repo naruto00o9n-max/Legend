@@ -48,6 +48,12 @@ public final class UiRunner extends Instrumentation {
     private void keyboard(){main(()->{View v=top.getCurrentFocus();if(v!=null)((InputMethodManager)top.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(v.getWindowToken(),0);});SystemClock.sleep(200);}
     private void back(){sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);SystemClock.sleep(350);}
     private void write(String name,String value)throws Exception{try(FileOutputStream f=new FileOutputStream(new File(out,name))){f.write(value.getBytes(StandardCharsets.UTF_8));}}
+    private void publish(File file)throws Exception{
+        ContentValues values=new ContentValues();values.put(MediaStore.Downloads.DISPLAY_NAME,file.getName());values.put(MediaStore.Downloads.MIME_TYPE,file.getName().endsWith(".png")?"image/png":file.getName().endsWith(".zip")?"application/zip":"application/json");values.put(MediaStore.Downloads.RELATIVE_PATH,"Download/Cookies-ui");values.put(MediaStore.Downloads.IS_PENDING,1);
+        Uri uri=target.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI,values);if(uri==null)throw new IOException("Cannot publish UI evidence");
+        try(InputStream input=new FileInputStream(file);OutputStream output=target.getContentResolver().openOutputStream(uri)){byte[] bytes=new byte[32768];int n;while((n=input.read(bytes))>0)output.write(bytes,0,n);}
+        values.clear();values.put(MediaStore.Downloads.IS_PENDING,0);target.getContentResolver().update(uri,values,null,null);
+    }
     private JSONObject tree(View v)throws Exception{
         JSONObject j=new JSONObject().put("class",v.getClass().getSimpleName()).put("visible",v.getVisibility()).put("enabled",v.isEnabled());
         try{j.put("id",v.getResources().getResourceEntryName(v.getId()));}catch(Exception ignored){}
@@ -60,6 +66,7 @@ public final class UiRunner extends Instrumentation {
         try(FileOutputStream f=new FileOutputStream(new File(out,stem+".png"))){if(!b.compress(Bitmap.CompressFormat.PNG,100,f))throw new AssertionError("Screenshot write");}finally{b.recycle();}
         final JSONObject[] hierarchy={null};main(()->{try{hierarchy[0]=tree(top.getWindow().getDecorView());}catch(Exception e){throw new RuntimeException(e);}});write(stem+".json",hierarchy[0].toString(2));
         steps.put(new JSONObject().put("screen",name).put("activity",top.getClass().getName()).put("operation",operation).put("file",stem+".png").put("hierarchy",stem+".json").put("status","captured"));
+        publish(new File(out,stem+".png"));publish(new File(out,stem+".json"));
         android.util.Log.i("CookiesUi",stage);write("ui-progress.json",new JSONObject().put("stage",stage).put("steps",steps).put("checks",checks).toString(2));
     }
     private void attempt(String name,Task task)throws Exception{
@@ -140,6 +147,7 @@ public final class UiRunner extends Instrumentation {
     private void screen(String suffix,String name)throws Exception{attempt(name,()->{launch(BASE+suffix,null);capture(name,"Opened activity with local services mode");});}
     private void zip()throws Exception{
         File archive=new File(out.getParentFile(),"cookies-ui-evidence.zip");try(ZipOutputStream z=new ZipOutputStream(new FileOutputStream(archive))){File[] files=out.listFiles();if(files==null)return;Arrays.sort(files);byte[] buffer=new byte[32768];for(File f:files){if(!f.isFile())continue;z.putNextEntry(new ZipEntry(f.getName()));try(FileInputStream s=new FileInputStream(f)){int n;while((n=s.read(buffer))>0)z.write(buffer,0,n);}z.closeEntry();}}
+        publish(archive);
     }
     @Override public void onStart(){
         Bundle result=new Bundle();int code=Activity.RESULT_OK;
