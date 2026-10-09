@@ -33,34 +33,94 @@
     "android_glyph_layout_parity": "not verified"
   },
   "android_runtime": {
-    "result": "blocked in local software emulator",
-    "boot": "Android 30 x86_64 software emulation with ARM native translation; no /dev/kvm",
-    "error": "Package service connection broke (Broken pipe 32) and installations timed out; software emulator also showed a System UI ANR. No Cookies app crash is established.",
-    "app_crash_proven": false,
-    "sign_in": "not attempted against original developer services",
-    "screenshot_evidence": "launch-screen.png: System UI is not responding, before Cookies application launch",
-    "environment_retry": "Lower resolution and longer hardware timeout allowed boot; APK installation still did not complete.",
-    "local_emulator_stopped": true
+    "result": "engine and launcher executed on Android 30 in GitHub Actions",
+    "local_software_emulator": "previously blocked; replaced for validation by accelerated CI emulator",
+    "app_installed": true,
+    "launcher_started": true,
+    "backend_access": false,
+    "editor_gesture_flows": "not tested; original sign-in is required",
+    "original_sign_in": "not attempted; original OAuth is not controlled by Cookies",
+    "launcher_labels": [
+      "🍪",
+      "Cookies",
+      "تسجيل الدخول باستخدام Google",
+      "يرجى تسجيل الدخول للمتابعة."
+    ]
   },
   "github": {
-    "repository_created": false,
-    "actions_started": false,
-    "reason": "awaiting account selection/new repository URL; connected naruto tools do not expose create-repository"
+    "repository_url": "https://github.com/naruto00o9n-max/Legend",
+    "repository_provided_by_user": true,
+    "code_uploaded": true,
+    "actions_started": true,
+    "verified_run_id": 37872638113,
+    "verified_source_commit": "4f3bb4555e34defecb019f9c2753594e0c518459",
+    "outcome": "Android build and actual rendering/export passed; iPhone components compiled; strict CoreText font comparison failed with documented differences.",
+    "run_url": "https://github.com/naruto00o9n-max/Legend/actions/runs/37872638113",
+    "artifacts": {
+      "android": 11591165528,
+      "reference_images_and_fonts": 11591330529,
+      "font_parity_report": 11590924034,
+      "iphone_components": 11590684400
+    }
   },
   "ios": {
     "editor_app_implemented": false,
-    "unsigned_ipa_built": false
+    "unsigned_ipa_built": false,
+    "native_components": {
+      "result": "compiled",
+      "sdk": "iphoneos",
+      "architecture": "arm64",
+      "minimum_ios": "15.0",
+      "components": [
+        "PNG C core",
+        "Swift typography",
+        "CoreText glyph measurement"
+      ],
+      "actual_iphone_runtime": "not verified"
+    }
   },
   "android_instrumentation": {
     "compilation": "pass against Android SDK 36",
-    "execution": "not yet run",
+    "execution": "pass",
     "planned_cases": "original font measurements and dialogue layout, nine text effects, twenty shapes, stroke/shadow/spacing/gradient/rotation",
-    "target": "actual restored renderer, not decompiled Java stubs"
+    "target": "actual restored renderer, not decompiled Java stubs",
+    "render_cases": 39,
+    "font_cases": 235,
+    "coverage": [
+      "actual original layer renderer",
+      "four baseline fonts",
+      "nine effects",
+      "twenty shapes",
+      "selected text properties",
+      "full 800x15000 original PNG export and bottom text"
+    ]
   },
   "coretext_comparison": {
-    "source_prepared": true,
-    "compilation": "requires macOS; not run here",
-    "execution": "not yet run",
-    "failure_on_formatting_mismatch": true
+    "compilation": "pass on macOS 15",
+    "execution": "235 real-font cases compared against original Android output",
+    "result": "port-needs-correction",
+    "matching_cases": 130,
+    "mismatches": 105,
+    "fractional_baseline_matching_cases": 99,
+    "failure_on_formatting_mismatch": true,
+    "report": "font-parity-report.json",
+    "scope": "Formatting strings only; raster image parity is not established."
+  },
+  "android_long_export": {
+    "result": "pass",
+    "width": 800,
+    "height": 15000,
+    "unchangedPixelsCompared": 12000000,
+    "opaqueRGB": true,
+    "decodedPNGVerified": true,
+    "bottomTextVerified": true,
+    "renderer": "actual original renderPageToBitmap",
+    "doesNotVerify": "Transparent hidden RGB, JPEG, PSD, editor gestures or iPhone runtime"
+  },
+  "android_artifact": {
+    "file": "cookies-reference-test.apk",
+    "bytes": 72411482,
+    "sha256": "f1d33141c0910bc2d653ee25cec2b7bebfb6728653e1afdf403ec64dfb242581",
+    "signing": "ephemeral CI test key; not original publisher signature"
   }
 }
