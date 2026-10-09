@@ -33,18 +33,17 @@
     "android_glyph_layout_parity": "not verified"
   },
   "android_runtime": {
-    "result": "engine and launcher executed on Android 30 in GitHub Actions",
+    "result": "pass on accelerated Android 30 emulator; UI, renderer and launcher",
     "local_software_emulator": "previously blocked; replaced for validation by accelerated CI emulator",
     "app_installed": true,
     "launcher_started": true,
     "backend_access": false,
-    "editor_gesture_flows": "not tested; original sign-in is required",
-    "original_sign_in": "not attempted; original OAuth is not controlled by Cookies",
+    "editor_gesture_flows": "pass: real pinch to page reading width, Arabic text controls, drawing, layers, project save/reopen and actual PNG export",
+    "original_sign_in": "disabled by user request; device-local email/password and guest tested",
     "launcher_labels": [
-      "🍪",
-      "Cookies",
-      "تسجيل الدخول باستخدام Google",
-      "يرجى تسجيل الدخول للمتابعة."
+      "COOKIES EDITOR",
+      "ابدأ مساحتك",
+      "تجربة المحرر دون حساب"
     ]
   },
   "github": {
@@ -52,15 +51,14 @@
     "repository_provided_by_user": true,
     "code_uploaded": true,
     "actions_started": true,
-    "verified_run_id": 37872638113,
-    "verified_source_commit": "4f3bb4555e34defecb019f9c2753594e0c518459",
-    "outcome": "Android build and actual rendering/export passed; iPhone components compiled; strict CoreText font comparison failed with documented differences.",
-    "run_url": "https://github.com/naruto00o9n-max/Legend/actions/runs/37872638113",
+    "verified_run_id": 37880268884,
+    "verified_source_commit": "d194b3fbbbcf59609a2d46e5affe8740dd7138ab",
+    "outcome": "All three Android jobs passed. iOS jobs deferred by user; existing strict font differences retained.",
+    "run_url": "https://github.com/naruto00o9n-max/Legend/actions/runs/37880268884",
     "artifacts": {
-      "android": 11591165528,
-      "reference_images_and_fonts": 11591330529,
-      "font_parity_report": 11590924034,
-      "iphone_components": 11590684400
+      "android": 11593334225,
+      "ui_screenshots": 11593839700,
+      "reference_images_and_fonts": 11594287346
     }
   },
   "ios": {
@@ -76,8 +74,11 @@
         "Swift typography",
         "CoreText glyph measurement"
       ],
-      "actual_iphone_runtime": "not verified"
-    }
+      "actual_iphone_runtime": "not verified",
+      "verified_run_id": 37872638113
+    },
+    "deferred_by_user": true,
+    "automatic_checks": "Android pushes skip iOS component checks; manual verify_ios=true keeps all strict assertions"
   },
   "android_instrumentation": {
     "compilation": "pass against Android SDK 36",
@@ -118,9 +119,56 @@
     "doesNotVerify": "Transparent hidden RGB, JPEG, PSD, editor gestures or iPhone runtime"
   },
   "android_artifact": {
-    "file": "cookies-reference-test.apk",
-    "bytes": 72411482,
-    "sha256": "f1d33141c0910bc2d653ee25cec2b7bebfb6728653e1afdf403ec64dfb242581",
-    "signing": "ephemeral CI test key; not original publisher signature"
+    "file": "Cookies-Editor-Android-offline.apk",
+    "bytes": 74443233,
+    "sha256": "ccbf561591e08392459bd5215adc3c59948713e59858bd3c344fe6cf5571f1bb",
+    "signing": "ephemeral CI test key; not original publisher signature; v2+v3 verified"
+  },
+  "android_authentication": {
+    "mode": "device-local profiles and guest",
+    "email_verified": false,
+    "password_hash": "PBKDF2 120000 rounds; HMAC-SHA256 API26+, HMAC-SHA1 API24-25",
+    "cloud_account": false,
+    "project_scope": "shared device-local workspace",
+    "google_enabled": false,
+    "internet_permission": false,
+    "entitlements_modified": false
+  },
+  "android_asset_preservation": {
+    "original_asset_and_native_entries": 63,
+    "all_byte_identical": true,
+    "protected_editor_model_smali": 414,
+    "all_unchanged_by_offline_hooks": true
+  },
+  "android_ui": {
+    "result": "pass",
+    "emulator_api": 30,
+    "screenshots": 58,
+    "native_cleaner_images": 3,
+    "activities_captured": 18,
+    "checks": 45,
+    "failed_checks": 0,
+    "report": "ui-verification.json",
+    "gallery": "cookies-ui-gallery.zip / index.html",
+    "scope": "Actual UI actions with selected assertions; opening a panel is not exhaustive verification",
+    "does_not_verify": [
+      "Every property or brush combination",
+      "JPEG/PSD workflows",
+      "Premium subscription tools",
+      "Physical devices and every Android release",
+      "iPhone runtime"
+    ]
+  },
+  "android_native_cleaner": {
+    "status": "pass",
+    "erasedDarkPixels": 1266,
+    "outsidePatchTransparent": true,
+    "scope": "Actual original OpenCV patch engine; not every inpainting scenario"
+  },
+  "android_preview": {
+    "observed_bitmap_width": 436,
+    "source_original_width": 800,
+    "original_png_export_width": 800,
+    "note": "Default reference resolution uses a downsampled preview; original file remains full resolution for export. Full-region mode is subject to original entitlement checks."
   }
 }

@@ -1,0 +1,6 @@
+{
+  "status": "pass",
+  "erasedDarkPixels": 1266,
+  "outsidePatchTransparent": true,
+  "scope": "Actual original OpenCV patch engine; not every inpainting scenario"
+}

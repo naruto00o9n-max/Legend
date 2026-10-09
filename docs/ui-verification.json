@@ -1,0 +1,659 @@
+{
+  "status": "pass",
+  "screenshots": 58,
+  "steps": [
+    {
+      "screen": "welcome",
+      "activity": "com.cookies.editor.local.WelcomeActivity",
+      "operation": "Actual redesigned welcome screen after entrance animation",
+      "file": "001-welcome.png",
+      "hierarchy": "001-welcome.json",
+      "status": "captured"
+    },
+    {
+      "screen": "welcome-motion",
+      "activity": "com.cookies.editor.local.WelcomeActivity",
+      "operation": "Second actual animation frame",
+      "file": "002-welcome-motion.png",
+      "hierarchy": "002-welcome-motion.json",
+      "status": "captured"
+    },
+    {
+      "screen": "local-sign-in-sheet",
+      "activity": "com.cookies.editor.local.WelcomeActivity",
+      "operation": "Opened the local email\/password bottom sheet",
+      "file": "003-local-sign-in-sheet.png",
+      "hierarchy": "003-local-sign-in-sheet.json",
+      "status": "captured"
+    },
+    {
+      "screen": "local-sign-up",
+      "activity": "com.cookies.editor.local.WelcomeActivity",
+      "operation": "Local email\/password form; password masked",
+      "file": "004-local-sign-up.png",
+      "hierarchy": "004-local-sign-up.json",
+      "status": "captured"
+    },
+    {
+      "screen": "dashboard",
+      "activity": "com.oneguystudio.ytyper.ui.dashboard.ProjectsActivity",
+      "operation": "Reached original dashboard through local profile",
+      "file": "005-dashboard.png",
+      "hierarchy": "005-dashboard.json",
+      "status": "captured"
+    },
+    {
+      "screen": "project-imported",
+      "activity": "com.oneguystudio.ytyper.ui.dashboard.ProjectGalleryActivity",
+      "operation": "Imported synthetic 800x15000 PNG through ACTION_SEND",
+      "file": "006-project-imported.png",
+      "hierarchy": "006-project-imported.json",
+      "status": "captured"
+    },
+    {
+      "screen": "project-gallery",
+      "activity": "com.oneguystudio.ytyper.ui.dashboard.ProjectGalleryActivity",
+      "operation": "Project page thumbnails and operations",
+      "file": "007-project-gallery.png",
+      "hierarchy": "007-project-gallery.json",
+      "status": "captured"
+    },
+    {
+      "screen": "editor-long-image",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Long source loaded in original canvas",
+      "file": "008-editor-long-image.png",
+      "hierarchy": "008-editor-long-image.json",
+      "status": "captured"
+    },
+    {
+      "screen": "editor-pinch-zoom",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Two-finger pointer sequence changed canvas transform",
+      "file": "009-editor-pinch-zoom.png",
+      "hierarchy": "009-editor-pinch-zoom.json",
+      "status": "captured"
+    },
+    {
+      "screen": "editor-reading-zoom",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Repeated real pinch gestures to inspect a section of the long page",
+      "file": "010-editor-reading-zoom.png",
+      "hierarchy": "010-editor-reading-zoom.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-added",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Clicked original add-text action",
+      "file": "011-text-added.png",
+      "hierarchy": "011-text-added.json",
+      "status": "captured"
+    },
+    {
+      "screen": "arabic-text",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Entered Arabic text in original editor",
+      "file": "012-arabic-text.png",
+      "hierarchy": "012-arabic-text.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-size-increased",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Increased font size through original UI and verified model change",
+      "file": "013-text-size-increased.png",
+      "hierarchy": "013-text-size-increased.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-readable-size",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Committed size 48, scale 100 percent and text box width through original IME Done actions; verified model",
+      "file": "014-text-readable-size.png",
+      "hierarchy": "014-text-readable-size.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-font",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "015-text-panel-font.png",
+      "hierarchy": "015-text-panel-font.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-format",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "016-text-panel-format.png",
+      "hierarchy": "016-text-panel-format.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-color",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "017-text-panel-color.png",
+      "hierarchy": "017-text-panel-color.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-stroke",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "018-text-panel-stroke.png",
+      "hierarchy": "018-text-panel-stroke.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-background",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "019-text-panel-background.png",
+      "hierarchy": "019-text-panel-background.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-shadow",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "020-text-panel-shadow.png",
+      "hierarchy": "020-text-panel-shadow.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-position",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "021-text-panel-position.png",
+      "hierarchy": "021-text-panel-position.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-spacing",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "022-text-panel-spacing.png",
+      "hierarchy": "022-text-panel-spacing.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-3d",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "023-text-panel-3d.png",
+      "hierarchy": "023-text-panel-3d.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-perspective",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "024-text-panel-perspective.png",
+      "hierarchy": "024-text-panel-perspective.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-effects",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "025-text-panel-effects.png",
+      "hierarchy": "025-text-panel-effects.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-texture",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "026-text-panel-texture.png",
+      "hierarchy": "026-text-panel-texture.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-opacity",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "027-text-panel-opacity.png",
+      "hierarchy": "027-text-panel-opacity.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-styles",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "028-text-panel-styles.png",
+      "hierarchy": "028-text-panel-styles.json",
+      "status": "captured"
+    },
+    {
+      "screen": "text-panel-eraser",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original text control panel; panel capture is not exhaustive parameter verification",
+      "file": "029-text-panel-eraser.png",
+      "hierarchy": "029-text-panel-eraser.json",
+      "status": "captured"
+    },
+    {
+      "screen": "drawing-tools",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Entered original drawing mode",
+      "file": "030-drawing-tools.png",
+      "hierarchy": "030-drawing-tools.json",
+      "status": "captured"
+    },
+    {
+      "screen": "drawing-stroke",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Injected stroke pointer sequence",
+      "file": "031-drawing-stroke.png",
+      "hierarchy": "031-drawing-stroke.json",
+      "status": "captured"
+    },
+    {
+      "screen": "layers",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original layers dialog",
+      "file": "032-layers.png",
+      "hierarchy": "032-layers.json",
+      "status": "captured"
+    },
+    {
+      "screen": "image-drafts",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original local image drafts dialog",
+      "file": "033-image-drafts.png",
+      "hierarchy": "033-image-drafts.json",
+      "status": "captured"
+    },
+    {
+      "screen": "canvas-resize-dialog",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original resize settings without modifying source dimensions",
+      "file": "034-canvas-resize-dialog.png",
+      "hierarchy": "034-canvas-resize-dialog.json",
+      "status": "captured"
+    },
+    {
+      "screen": "background-crop",
+      "activity": "com.oneguystudio.ytyper.ui.editor.ImageCropActivity",
+      "operation": "Opened actual crop activity for the long source",
+      "file": "035-background-crop.png",
+      "hierarchy": "035-background-crop.json",
+      "status": "captured"
+    },
+    {
+      "screen": "shapes-picker",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Opened original shape picker",
+      "file": "036-shapes-picker.png",
+      "hierarchy": "036-shapes-picker.json",
+      "status": "captured"
+    },
+    {
+      "screen": "undo",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Original undo button",
+      "file": "037-undo.png",
+      "hierarchy": "037-undo.json",
+      "status": "captured"
+    },
+    {
+      "screen": "redo",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Original redo button",
+      "file": "038-redo.png",
+      "hierarchy": "038-redo.json",
+      "status": "captured"
+    },
+    {
+      "screen": "project-reopened",
+      "activity": "com.oneguystudio.ytyper.ui.editor.EditorActivity",
+      "operation": "Saved project reopened with Arabic text layers",
+      "file": "039-project-reopened.png",
+      "hierarchy": "039-project-reopened.json",
+      "status": "captured"
+    },
+    {
+      "screen": "export-studio",
+      "activity": "com.oneguystudio.ytyper.ui.editor.ExportStudioActivity",
+      "operation": "Original page selection and export settings",
+      "file": "040-export-studio.png",
+      "hierarchy": "040-export-studio.json",
+      "status": "captured"
+    },
+    {
+      "screen": "export-selected",
+      "activity": "com.oneguystudio.ytyper.ui.editor.ExportStudioActivity",
+      "operation": "Selected project pages for lossless export",
+      "file": "041-export-selected.png",
+      "hierarchy": "041-export-selected.json",
+      "status": "captured"
+    },
+    {
+      "screen": "png-export-finished",
+      "activity": "com.oneguystudio.ytyper.ui.editor.ExportStudioActivity",
+      "operation": "Actual PNG export to gallery retained 800x15000 dimensions",
+      "file": "042-png-export-finished.png",
+      "hierarchy": "042-png-export-finished.json",
+      "status": "captured"
+    },
+    {
+      "screen": "reader",
+      "activity": "com.oneguystudio.ytyper.ui.editor.ReaderActivity",
+      "operation": "Original reader with fixture image",
+      "file": "043-reader.png",
+      "hierarchy": "043-reader.json",
+      "status": "captured"
+    },
+    {
+      "screen": "font-library",
+      "activity": "com.oneguystudio.ytyper.ui.library.FontLibraryActivity",
+      "operation": "Opened activity with local services mode",
+      "file": "044-font-library.png",
+      "hierarchy": "044-font-library.json",
+      "status": "captured"
+    },
+    {
+      "screen": "arabic-fonts",
+      "activity": "com.oneguystudio.ytyper.ui.library.ArabicFontsActivity",
+      "operation": "Opened activity with local services mode",
+      "file": "045-arabic-fonts.png",
+      "hierarchy": "045-arabic-fonts.json",
+      "status": "captured"
+    },
+    {
+      "screen": "english-fonts",
+      "activity": "com.oneguystudio.ytyper.ui.library.EnglishFontsActivity",
+      "operation": "Opened activity with local services mode",
+      "file": "046-english-fonts.png",
+      "hierarchy": "046-english-fonts.json",
+      "status": "captured"
+    },
+    {
+      "screen": "imported-fonts",
+      "activity": "com.oneguystudio.ytyper.ui.library.ImportedFontsActivity",
+      "operation": "Opened activity with local services mode",
+      "file": "047-imported-fonts.png",
+      "hierarchy": "047-imported-fonts.json",
+      "status": "captured"
+    },
+    {
+      "screen": "floating-assistant",
+      "activity": "com.oneguystudio.ytyper.ui.floatingwidget.FolatingWidgetDashboard",
+      "operation": "Opened activity with local services mode",
+      "file": "048-floating-assistant.png",
+      "hierarchy": "048-floating-assistant.json",
+      "status": "captured"
+    },
+    {
+      "screen": "settings-local-profile",
+      "activity": "com.oneguystudio.ytyper.ui.settings.SettingsActivity",
+      "operation": "Opened activity with local services mode",
+      "file": "049-settings-local-profile.png",
+      "hierarchy": "049-settings-local-profile.json",
+      "status": "captured"
+    },
+    {
+      "screen": "tag-mini-editor",
+      "activity": "com.oneguystudio.ytyper.ui.editor.TagMiniEditorActivity",
+      "operation": "Opened original mini editor with a local tag",
+      "file": "050-tag-mini-editor.png",
+      "hierarchy": "050-tag-mini-editor.json",
+      "status": "captured"
+    },
+    {
+      "screen": "assistant-dialogue-input",
+      "activity": "com.oneguystudio.ytyper.ui.floatingwidget.FolatingWidgetDashboard",
+      "operation": "Entered local dialogue text for the floating assistant",
+      "file": "051-assistant-dialogue-input.png",
+      "hierarchy": "051-assistant-dialogue-input.json",
+      "status": "captured"
+    },
+    {
+      "screen": "floating-window",
+      "activity": "com.oneguystudio.ytyper.ui.dashboard.ProjectsActivity",
+      "operation": "Original floating service running above Cookies dashboard",
+      "file": "052-floating-window.png",
+      "hierarchy": "052-floating-window.json",
+      "status": "captured"
+    },
+    {
+      "screen": "floating-above-home",
+      "activity": "com.oneguystudio.ytyper.ui.dashboard.ProjectsActivity",
+      "operation": "Verified separate launcher window and visible original Arabic dialogue overlay through accessibility, then captured the actual screen",
+      "file": "053-floating-above-home.png",
+      "hierarchy": "053-floating-above-home.json",
+      "status": "captured"
+    },
+    {
+      "screen": "store-disabled-preview",
+      "activity": "com.oneguystudio.ytyper.ui.dashboard.StoreActivity",
+      "operation": "Opened activity with local services mode",
+      "file": "054-store-disabled-preview.png",
+      "hierarchy": "054-store-disabled-preview.json",
+      "status": "captured"
+    },
+    {
+      "screen": "community-disabled-preview",
+      "activity": "com.oneguystudio.ytyper.ui.community.CommunityActivity",
+      "operation": "Opened activity with local services mode",
+      "file": "055-community-disabled-preview.png",
+      "hierarchy": "055-community-disabled-preview.json",
+      "status": "captured"
+    },
+    {
+      "screen": "create-post-disabled-preview",
+      "activity": "com.oneguystudio.ytyper.ui.community.CreatePostActivity",
+      "operation": "Opened activity with local services mode",
+      "file": "056-create-post-disabled-preview.png",
+      "hierarchy": "056-create-post-disabled-preview.json",
+      "status": "captured"
+    },
+    {
+      "screen": "webtoon-disabled-preview",
+      "activity": "com.oneguystudio.ytyper.ui.dashboard.WebtoonScraperActivity",
+      "operation": "Opened activity with local services mode",
+      "file": "057-webtoon-disabled-preview.png",
+      "hierarchy": "057-webtoon-disabled-preview.json",
+      "status": "captured"
+    },
+    {
+      "screen": "guest-dashboard",
+      "activity": "com.oneguystudio.ytyper.ui.dashboard.ProjectsActivity",
+      "operation": "Guest opened original local dashboard after resetting navigation task",
+      "file": "058-guest-dashboard.png",
+      "hierarchy": "058-guest-dashboard.json",
+      "status": "captured"
+    }
+  ],
+  "checks": [
+    {
+      "name": "network-isolated",
+      "status": "pass"
+    },
+    {
+      "name": "local-account-authentication",
+      "status": "pass"
+    },
+    {
+      "name": "welcome-email-entry",
+      "status": "pass"
+    },
+    {
+      "name": "text-size-control",
+      "status": "pass"
+    },
+    {
+      "name": "panel-font",
+      "status": "pass"
+    },
+    {
+      "name": "panel-format",
+      "status": "pass"
+    },
+    {
+      "name": "panel-color",
+      "status": "pass"
+    },
+    {
+      "name": "panel-stroke",
+      "status": "pass"
+    },
+    {
+      "name": "panel-background",
+      "status": "pass"
+    },
+    {
+      "name": "panel-shadow",
+      "status": "pass"
+    },
+    {
+      "name": "panel-position",
+      "status": "pass"
+    },
+    {
+      "name": "panel-spacing",
+      "status": "pass"
+    },
+    {
+      "name": "panel-3d",
+      "status": "pass"
+    },
+    {
+      "name": "panel-perspective",
+      "status": "pass"
+    },
+    {
+      "name": "panel-effects",
+      "status": "pass"
+    },
+    {
+      "name": "panel-texture",
+      "status": "pass"
+    },
+    {
+      "name": "panel-opacity",
+      "status": "pass"
+    },
+    {
+      "name": "panel-styles",
+      "status": "pass"
+    },
+    {
+      "name": "panel-eraser",
+      "status": "pass"
+    },
+    {
+      "name": "drawing-stroke",
+      "status": "pass"
+    },
+    {
+      "name": "layers",
+      "status": "pass"
+    },
+    {
+      "name": "image-drafts",
+      "status": "pass"
+    },
+    {
+      "name": "canvas-resize-dialog",
+      "status": "pass"
+    },
+    {
+      "name": "background-crop",
+      "status": "pass"
+    },
+    {
+      "name": "shapes-picker",
+      "status": "pass"
+    },
+    {
+      "name": "undo-redo",
+      "status": "pass"
+    },
+    {
+      "name": "project-round-trip",
+      "status": "pass"
+    },
+    {
+      "name": "export-studio",
+      "status": "pass"
+    },
+    {
+      "name": "png-export-through-ui",
+      "status": "pass"
+    },
+    {
+      "name": "reader",
+      "status": "pass"
+    },
+    {
+      "name": "editor-workflow",
+      "status": "pass"
+    },
+    {
+      "name": "native-smart-cleaner",
+      "status": "pass"
+    },
+    {
+      "name": "font-library",
+      "status": "pass"
+    },
+    {
+      "name": "arabic-fonts",
+      "status": "pass"
+    },
+    {
+      "name": "english-fonts",
+      "status": "pass"
+    },
+    {
+      "name": "imported-fonts",
+      "status": "pass"
+    },
+    {
+      "name": "floating-assistant",
+      "status": "pass"
+    },
+    {
+      "name": "settings-local-profile",
+      "status": "pass"
+    },
+    {
+      "name": "tag-mini-editor",
+      "status": "pass"
+    },
+    {
+      "name": "floating-window-service",
+      "status": "pass"
+    },
+    {
+      "name": "store-disabled-preview",
+      "status": "pass"
+    },
+    {
+      "name": "community-disabled-preview",
+      "status": "pass"
+    },
+    {
+      "name": "create-post-disabled-preview",
+      "status": "pass"
+    },
+    {
+      "name": "webtoon-disabled-preview",
+      "status": "pass"
+    },
+    {
+      "name": "guest-entry",
+      "status": "pass"
+    }
+  ],
+  "limitations": [
+    "Offline service screens are original-layout previews, not functioning cloud services",
+    "UI actions plus selected end-to-end flows; not every combination of properties",
+    "Paid feature entitlement checks retained",
+    "Original ARM OpenCV cleaner tested through emulator native translation; not every native operation",
+    "No iPhone application tested"
+  ]
+}

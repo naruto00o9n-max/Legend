@@ -1,10 +1,12 @@
 {
   "reference_sha256": "56ed425f56d0d8614c39ad3e0a50f4eb3528e35676b1f4dc49bbfced4b033e3b",
-  "rebuilt_sha256": "74ef5510472883d472de74cd1453d1817fb9b37be089127e4086219c82659119",
+  "rebuilt_sha256": "ccbf561591e08392459bd5215adc3c59948713e59858bd3c344fe6cf5571f1bb",
   "font_psd_and_native_entries_checked": 63,
   "changed_rendering_assets": [],
   "archive_integrity": "pass",
-  "runtime_editor_parity": "not yet verified",
-  "google_login_with_new_signature": "not verified; original OAuth service is not controlled by Cookies",
-  "ios_status": "not built from this Android artifact"
+  "runtime_editor_parity": "requires UI workflow evidence",
+  "authentication": "local profiles and guest; Google sign-in disabled",
+  "network": "INTERNET permission removed; cloud screens disabled",
+  "entitlements_modified": false,
+  "ios_status": "port components only; iOS app deferred until Android completion"
 }
