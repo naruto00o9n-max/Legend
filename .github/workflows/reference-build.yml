@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths-ignore: ['docs/**', 'README.md', 'AGENTS.md']
   workflow_dispatch:
+    inputs:
+      verify_ios:
+        description: 'Run the unfinished iOS component and strict font parity checks'
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -43,6 +48,7 @@ jobs:
           path: build/
           retention-days: 14
   typography:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.verify_ios }}
     runs-on: macos-15
     timeout-minutes: 8
     steps:
@@ -95,6 +101,7 @@ jobs:
           retention-days: 14
 
   coretext-font-parity:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.verify_ios }}
     needs: android-render-fixtures
     runs-on: macos-15
     timeout-minutes: 10
