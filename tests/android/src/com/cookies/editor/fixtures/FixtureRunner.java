@@ -2,15 +2,21 @@ package com.cookies.editor.fixtures;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.ContentValues;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Build;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.TextPaint;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -18,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -133,6 +141,85 @@ public final class FixtureRunner extends Instrumentation {
             render("shape-"+((Enum<?>)shape).name().toLowerCase(Locale.ROOT),value,true);
         }
     }
+    private int sourcePixel(int x,int y) {
+        return Color.rgb((x*17+y*31)&255,(x*7+y*13)&255,(x*3+y*19)&255);
+    }
+    private void saveBitmap(String name,Bitmap bitmap)throws Exception {
+        try(FileOutputStream stream=new FileOutputStream(new File(output,name))){
+            if(!bitmap.compress(Bitmap.CompressFormat.PNG,100,stream))throw new AssertionError("PNG export failed: "+name);
+        }
+    }
+    private void verifyLongImage(Bitmap bitmap,boolean edited)throws Exception {
+        if(bitmap==null)throw new AssertionError("Original export returned null for 800x15000");
+        if(bitmap.getWidth()!=800||bitmap.getHeight()!=15000)throw new AssertionError("Original export changed source dimensions");
+        int[] row=new int[800];long changed=0;
+        for(int y=0;y<15000;y++){
+            bitmap.getPixels(row,0,800,0,y,800,1);
+            for(int x=0;x<800;x++)if(row[x]!=sourcePixel(x,y)){
+                if(!edited||y<14000)throw new AssertionError("Original export changed an unedited pixel at "+x+","+y);
+                changed++;
+            }
+        }
+        if(edited&&changed==0)throw new AssertionError("Text near the bottom was lost during long-image export");
+    }
+    private void longImageFixtures()throws Exception {
+        File source=new File(output,"long-source.png");
+        Bitmap original=Bitmap.createBitmap(800,15000,Bitmap.Config.ARGB_8888);
+        try {
+            int[] row=new int[800];
+            for(int y=0;y<15000;y++){
+                for(int x=0;x<800;x++)row[x]=sourcePixel(x,y);
+                original.setPixels(row,0,800,0,y,800,1);
+            }
+            saveBitmap(source.getName(),original);
+        }finally{original.recycle();}
+        Class<?> configClass=type("data.model.CanvasConfig"),pageClass=type("data.model.PageState"),exportClass=type("engine.YTyperExportEngine");
+        Object config=configClass.getConstructor().newInstance();
+        property(config,"width",800);property(config,"height",15000);property(config,"backgroundImagePath",source.getAbsolutePath());
+        Object page=pageClass.getConstructor().newInstance();property(page,"canvasConfig",config);
+        Object exporter=exportClass.getConstructor(Context.class).newInstance(target);
+        Method export=exportClass.getMethod("renderPageToBitmap",pageClass,String.class);
+        property(page,"layers",java.util.Collections.emptyList());
+        Bitmap unchanged=(Bitmap)export.invoke(exporter,page,"PNG");
+        try{verifyLongImage(unchanged,false);saveBitmap("long-unchanged.png",unchanged);}finally{if(unchanged!=null)unchanged.recycle();}
+        Bitmap decoded=BitmapFactory.decodeFile(new File(output,"long-unchanged.png").getAbsolutePath());
+        try{verifyLongImage(decoded,false);}finally{if(decoded!=null)decoded.recycle();}
+        Object bottom=text("hayah.ttf");property(bottom,"textContent","آخر الصورة — اختبار عربي");property(bottom,"x",400f);property(bottom,"y",14740f);property(bottom,"boxWidth",500f);
+        property(page,"layers",java.util.Collections.singletonList(bottom));
+        Bitmap edited=(Bitmap)export.invoke(exporter,page,"PNG");
+        try{verifyLongImage(edited,true);saveBitmap("long-bottom-text.png",edited);}finally{if(edited!=null)edited.recycle();}
+        saveJson("long-image-verification.json",new JSONObject().put("result","pass").put("width",800).put("height",15000)
+            .put("unchangedPixelsCompared",12000000).put("opaqueRGB",true).put("decodedPNGVerified",true)
+            .put("bottomTextVerified",true).put("renderer","actual original renderPageToBitmap")
+            .put("doesNotVerify","Transparent hidden RGB, JPEG, PSD, editor gestures or iPhone runtime"));
+    }
+    private void publishFixtures()throws Exception {
+        // Android scoped storage prevents the adb shell from reading app-private
+        // external files. Publish our own test output through the supported API.
+        ContentValues values=new ContentValues();
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME,"cookies-reference-fixtures.zip");
+        values.put(MediaStore.MediaColumns.MIME_TYPE,"application/zip");
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH,"Download/Cookies-reference");
+        values.put(MediaStore.MediaColumns.IS_PENDING,1);
+        Uri uri=target.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI,values);
+        if(uri==null)throw new IllegalStateException("Cannot publish test fixtures");
+        boolean complete=false;
+        try {
+            try(OutputStream stream=target.getContentResolver().openOutputStream(uri);ZipOutputStream zip=new ZipOutputStream(stream)){
+                File[] files=output.listFiles();if(files==null)throw new IllegalStateException("Fixtures missing");
+                byte[] buffer=new byte[16384];
+                for(File file:files){
+                    if(!file.isFile())continue;
+                    zip.putNextEntry(new ZipEntry(file.getName()));
+                    try(FileInputStream input=new FileInputStream(file)){
+                        int count;while((count=input.read(buffer))!=-1)zip.write(buffer,0,count);
+                    }
+                    zip.closeEntry();
+                }
+            }
+            values.clear();values.put(MediaStore.MediaColumns.IS_PENDING,0);target.getContentResolver().update(uri,values,null,null);complete=true;
+        }finally{if(!complete)target.getContentResolver().delete(uri,null,null);}
+    }
     @Override public void onStart() {
         Bundle result=new Bundle();
         try {
@@ -140,10 +227,12 @@ public final class FixtureRunner extends Instrumentation {
             output=new File(target.getExternalFilesDir(null),"reference-fixtures");if(!output.mkdirs()&&!output.isDirectory())throw new IllegalStateException("Fixture storage unavailable");
             textClass=type("data.model.TextLayer");layerClass=type("data.model.LayerData");Class<?> rendering=type("engine.LayerRendererEngine");
             renderer=rendering.getConstructor().newInstance();draw=rendering.getMethod("renderLayer",Canvas.class,layerClass);
-            fontFixtures();styleFixtures();shapeFixtures();saveJson("render-manifest.json",renderCases);
+            fontFixtures();styleFixtures();shapeFixtures();saveJson("render-manifest.json",renderCases);longImageFixtures();
             saveJson("verification.json",new JSONObject().put("result","pass").put("renderer","actual YTyper 3.8 smali in rebranded reference APK").put("androidApi",Build.VERSION.SDK_INT).put("renderCases",renderCases.length()).put("iosParity","not yet evaluated").put("backendAccess",false));
+            publishFixtures();
             result.putString("stream","Reference rendering and font fixtures captured: "+renderCases.length());finish(-1,result);
         }catch(Throwable failure){
+            failure.printStackTrace();
             result.putString("stream","REFERENCE FIXTURE FAILURE: "+failure.toString());finish(0,result);
         }
     }

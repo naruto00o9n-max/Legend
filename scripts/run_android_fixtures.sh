@@ -21,13 +21,23 @@ if ! python3 -c "from pathlib import Path; assert 'INSTRUMENTATION_CODE: -1' in 
   cat build/runtime/instrumentation.txt
   exit 1
 fi
-adb pull /sdcard/Android/data/com.cookies.editor/files/reference-fixtures build/runtime/reference-fixtures
+adb pull /sdcard/Download/Cookies-reference/cookies-reference-fixtures.zip build/runtime/fixtures.zip
+python3 - <<'PYZIP'
+import pathlib,zipfile
+with zipfile.ZipFile('build/runtime/fixtures.zip') as archive:
+    assert archive.testzip() is None
+    archive.extractall('build/runtime/reference-fixtures')
+PYZIP
 python3 - <<'PY'
 import json,pathlib
 p=pathlib.Path('build/runtime/reference-fixtures')
 r=json.loads((p/'verification.json').read_text())
 assert r['result']=='pass'
 assert r['renderCases']>=20
+long_image=json.loads((p/'long-image-verification.json').read_text())
+assert long_image['result']=='pass'
+assert (long_image['width'],long_image['height'])==(800,15000)
+assert long_image['decodedPNGVerified'] and long_image['bottomTextVerified']
 assert len(json.loads((p/'typography-android.json').read_text()))>=100
 print('Actual original Android renderer cases:',r['renderCases'])
 print('iOS image/glyph parity has not been evaluated by this Android test.')
