@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -25,6 +25,9 @@ jobs:
       - name: Verify 800x15000 PNG core
         run: ./scripts/test_pixel_core.sh
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Prepare Android compiler tools
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - name: Reconstruct pinned Android reference
@@ -42,11 +45,11 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 8
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Verify recovered typography algorithm
         run: |
           mkdir -p .work
-          swiftc ios/Engine/Typesetter.swift tests/typesetter.swift -o .work/test-typesetter
+          swiftc ios/Engine/Typesetter.swift tests/typography_checks.swift -o .work/test-typesetter
           .work/test-typesetter
 
   android-render-fixtures:
@@ -54,8 +57,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -88,7 +91,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v4
         with:
           name: original-renderer-and-font-fixtures

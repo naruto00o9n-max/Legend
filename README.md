@@ -16,7 +16,7 @@ Read [the Arabic audit](docs/فحص-التطبيق.md) and [the screen/property 
 
 # Compile the recovered typography algorithm's platform-independent checks.
 mkdir -p .work
-swiftc ios/Engine/Typesetter.swift tests/typesetter.swift -o .work/test-typesetter
+swiftc ios/Engine/Typesetter.swift tests/typography_checks.swift -o .work/test-typesetter
 .work/test-typesetter
 ```
 
