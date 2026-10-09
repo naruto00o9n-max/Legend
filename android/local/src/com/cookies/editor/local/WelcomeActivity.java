@@ -1,6 +1,7 @@
 package com.cookies.editor.local;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -19,7 +20,7 @@ import java.util.concurrent.Executors;
 
 /** Original editor follows this screen; this is the only redesigned screen. */
 public final class WelcomeActivity extends Activity {
-    public static final int EMAIL_ID = 0xc001, PASSWORD_ID = 0xc002, SUBMIT_ID = 0xc003, GUEST_ID = 0xc004;
+    public static final int EMAIL_ID = 0xc001, PASSWORD_ID = 0xc002, SUBMIT_ID = 0xc003, GUEST_ID = 0xc004, ENTRY_ID = 0xc005;
     private final int gold = 0xffe7c66b, muted = 0xffa9a69d;
     private EditText email, password;
     private TextView submit, switchMode, error, cardTitle;
@@ -27,6 +28,7 @@ public final class WelcomeActivity extends Activity {
     private MotionArtwork backdrop, hero;
     private ExecutorService worker;
     private Typeface arabic;
+    private Dialog authDialog;
     private int dp(float value) { return Math.round(value * getResources().getDisplayMetrics().density); }
     private LinearLayout.LayoutParams lp(int width, int height) { return new LinearLayout.LayoutParams(width < 0 ? width : dp(width), height < 0 ? height : dp(height)); }
     private GradientDrawable box(int fill, int stroke, int radius) {
@@ -35,6 +37,7 @@ public final class WelcomeActivity extends Activity {
     }
     private TextView text(String s, int size, int color, boolean bold) {
         TextView t = new TextView(this); t.setText(s); t.setTextSize(size); t.setTextColor(color);
+        t.setIncludeFontPadding(false);
         t.setTypeface(arabic, bold ? Typeface.BOLD : Typeface.NORMAL); t.setGravity(Gravity.CENTER);
         t.setLayoutDirection(View.LAYOUT_DIRECTION_RTL); return t;
     }
@@ -58,7 +61,7 @@ public final class WelcomeActivity extends Activity {
         ScrollView scroll = new ScrollView(this); scroll.setFillViewport(true); scroll.setClipToPadding(false); scroll.setVerticalScrollBarEnabled(false);
         root.addView(scroll, new FrameLayout.LayoutParams(-1, -1));
         LinearLayout body = new LinearLayout(this); body.setOrientation(LinearLayout.VERTICAL); body.setGravity(Gravity.CENTER_HORIZONTAL);
-        body.setPadding(dp(24), dp(22), dp(24), dp(20)); scroll.addView(body, new ScrollView.LayoutParams(-1, -2));
+        body.setPadding(dp(24), dp(16), dp(24), dp(16)); scroll.addView(body, new ScrollView.LayoutParams(-1, -2));
         LinearLayout brand = new LinearLayout(this); brand.setGravity(Gravity.CENTER_VERTICAL); brand.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         ImageView logo = new ImageView(this);
         try { logo.setImageDrawable(android.graphics.drawable.Drawable.createFromStream(getAssets().open("cookies/welcome-logo.png"), null)); } catch (Exception ignored) {}
@@ -69,8 +72,10 @@ public final class WelcomeActivity extends Activity {
         TextView badge = text("نسخة التجربة", 10, gold, false); badge.setPadding(dp(10),dp(5),dp(10),dp(5)); badge.setBackground(box(0x20d4af37,0x3dc7a347,30));
         LinearLayout.LayoutParams badgeLp=lp(-2,-2); badgeLp.leftMargin=dp(20); brand.addView(badge,badgeLp); body.addView(brand,lp(-2,46));
         hero = new MotionArtwork(this, true); hero.setContentDescription("معاينة فنية متحركة لصفحة مانهوا وطبقات النص والرسم");
-        LinearLayout.LayoutParams heroLp=lp(-1,210); heroLp.topMargin=dp(12); body.addView(hero,heroLp);
-        TextView headline = text("امنح كل حوار\nبصمتك الخاصة.", 29, 0xfff7f1e5, true); headline.setLineSpacing(dp(-3),1f); body.addView(headline,lp(-1,-2));
+        float screenDp=getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density;
+        int heroHeight=Math.max(136,Math.min(220,(int)screenDp-510));
+        LinearLayout.LayoutParams heroLp=lp(-1,heroHeight); heroLp.topMargin=dp(10); body.addView(hero,heroLp);
+        TextView headline = text("امنح كل حوار\nبصمتك الخاصة.", 27, 0xfff7f1e5, true); headline.setLineSpacing(36*getResources().getDisplayMetrics().scaledDensity-headline.getPaint().getFontSpacing(),1f); body.addView(headline,lp(-1,-2));
         TextView subtitle=text("مساحتك للنصوص والطبقات والإبداع",13,muted,false); LinearLayout.LayoutParams subLp=lp(-1,-2);subLp.topMargin=dp(4);body.addView(subtitle,subLp);
         LinearLayout chips = new LinearLayout(this); chips.setGravity(Gravity.CENTER); chips.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         for(String s:new String[]{"صور طويلة","خطوط عربية","طبقات"}) {
@@ -79,7 +84,10 @@ public final class WelcomeActivity extends Activity {
         }
         LinearLayout.LayoutParams chipsLp=lp(-1,-2);chipsLp.topMargin=dp(12);chipsLp.bottomMargin=dp(18);body.addView(chips,chipsLp);
         LinearLayout card=new LinearLayout(this);card.setOrientation(LinearLayout.VERTICAL);card.setPadding(dp(18),dp(18),dp(18),dp(16));
-        card.setBackground(box(0xd915161a,0x45bf9d50,24));card.setElevation(dp(10));body.addView(card,lp(-1,-2));
+        card.setBackground(box(0xf515161a,0x65bf9d50,24));card.setElevation(dp(10));
+        authDialog=new Dialog(this);authDialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        ScrollView authScroll=new ScrollView(this);authScroll.setFillViewport(false);authScroll.setPadding(dp(16),dp(12),dp(16),dp(16));authScroll.addView(card,new ScrollView.LayoutParams(-1,-2));authDialog.setContentView(authScroll);
+        authDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);authDialog.getWindow().setGravity(Gravity.BOTTOM);authDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);authDialog.getWindow().setNavigationBarColor(0xff090a0c);
         cardTitle=text("أنشئ ملفك المحلي",18,0xfff8f1df,true);cardTitle.setGravity(Gravity.RIGHT);card.addView(cardTitle,lp(-1,-2));
         TextView note=text("على هذا الجهاز · دون اتصال",11,muted,false);note.setGravity(Gravity.RIGHT);card.addView(note,lp(-1,-2));
         TextView el=text("البريد الإلكتروني",11,0xffc9c4b8,false);el.setGravity(Gravity.RIGHT);LinearLayout.LayoutParams label=lp(-1,-2);label.topMargin=dp(12);card.addView(el,label);
@@ -90,6 +98,7 @@ public final class WelcomeActivity extends Activity {
         error=text("",11,0xffffab91,false);error.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);error.setVisibility(View.GONE);card.addView(error,lp(-1,-2));
         submit=button("إنشاء الملف والدخول",true);submit.setId(SUBMIT_ID);LinearLayout.LayoutParams sl=lp(-1,52);sl.topMargin=dp(18);card.addView(submit,sl);submit.setOnClickListener(v->authenticate());
         switchMode=text("لديك ملف محلي؟ تسجيل الدخول",12,gold,false);LinearLayout.LayoutParams sw=lp(-1,40);sw.topMargin=dp(3);card.addView(switchMode,sw);switchMode.setOnClickListener(v->{if(busy)return;register=!register;cardTitle.setText(register?"أنشئ ملفك المحلي":"مرحبًا بعودتك");submit.setText(register?"إنشاء الملف والدخول":"تسجيل الدخول");submit.setContentDescription(submit.getText());switchMode.setText(register?"لديك ملف محلي؟ تسجيل الدخول":"مستخدم جديد؟ إنشاء ملف محلي");error.setVisibility(View.GONE);});
+        TextView entry=button("ابدأ مساحتك  ←",true);entry.setId(ENTRY_ID);entry.setContentDescription("الدخول بالبريد وكلمة المرور");body.addView(entry,lp(-1,52));entry.setOnClickListener(v->{authDialog.show();authDialog.getWindow().setLayout(-1,-2);authScroll.setAlpha(0);authScroll.setTranslationY(dp(24));authScroll.animate().alpha(1).translationY(0).setDuration(260).start();});
         TextView guest=button("تجربة المحرر دون حساب",false);guest.setId(GUEST_ID);LinearLayout.LayoutParams gl=lp(-1,48);gl.topMargin=dp(14);body.addView(guest,gl);guest.setOnClickListener(v->{if(!busy){LocalAccounts.guest(this);openEditor();}});
         TextView footer=text("محفوظ محليًا. الخدمات السحابية معطلة مؤقتًا.",10,0xff858578,false);LinearLayout.LayoutParams fl=lp(-1,-2);fl.topMargin=dp(12);body.addView(footer,fl);
         setContentView(root);
@@ -104,10 +113,11 @@ public final class WelcomeActivity extends Activity {
     }
     private void openEditor(){
         ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(email.getWindowToken(),0);
+        if(authDialog!=null&&authDialog.isShowing())authDialog.dismiss();
         Intent intent=new Intent();intent.setClassName(this,"com.oneguystudio.ytyper.ui.dashboard.ProjectsActivity");startActivity(intent);overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);finish();
     }
     @Override protected void onSaveInstanceState(Bundle out){super.onSaveInstanceState(out);out.putString("email",email.getText().toString());}
     @Override protected void onResume(){super.onResume();if(backdrop!=null)backdrop.start();if(hero!=null)hero.start();}
     @Override protected void onPause(){if(backdrop!=null)backdrop.stop();if(hero!=null)hero.stop();super.onPause();}
-    @Override protected void onDestroy(){if(worker!=null)worker.shutdown();super.onDestroy();}
+    @Override protected void onDestroy(){if(authDialog!=null)authDialog.dismiss();if(worker!=null)worker.shutdown();super.onDestroy();}
 }

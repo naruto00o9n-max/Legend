@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
+import android.content.res.Configuration;
+import java.util.Locale;
 
 /** Narrow local hooks: no subscription unlocks, credentials, or renderer changes. */
 public final class OfflineBridge {
@@ -14,9 +16,17 @@ public final class OfflineBridge {
     private static void text(Activity a,String name,String value){View v=a.findViewById(id(a,name));if(v instanceof TextView)((TextView)v).setText(value);}
     public static void unavailable(Context c){Toast.makeText(c,"الخدمة السحابية معطلة مؤقتًا في نسخة التجربة.",Toast.LENGTH_LONG).show();}
     private static void disable(Activity a,String name){View v=a.findViewById(id(a,name));if(v!=null)v.setOnClickListener(view->unavailable(a));}
+    private static void locale(Context c){
+        String language=c.getSharedPreferences("AshtyperPrefs",0).getString("app_language","ar");
+        Locale l=new Locale(language==null?"ar":language);Locale.setDefault(l);
+        Configuration config=new Configuration(c.getResources().getConfiguration());
+        config.setLocale(l);config.setLayoutDirection(l);c.getResources().updateConfiguration(config,c.getResources().getDisplayMetrics());
+    }
     public static void install(Application app){
+        locale(app);
         app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks(){
-            @Override public void onActivityCreated(Activity a,Bundle b){}
+            @Override public void onActivityCreated(Activity a,Bundle b){locale(a);}
+            @Override public void onActivityPreCreated(Activity a,Bundle b){locale(a);}
             @Override public void onActivityStarted(Activity a){}
             @Override public void onActivityResumed(Activity a){
                 String name=a.getClass().getName();

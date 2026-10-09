@@ -22,6 +22,7 @@ public final class UiRunner extends Instrumentation {
     private static final String BASE="com.oneguystudio.ytyper.";
     private Context target; private ClassLoader loader; private File out;
     private volatile Activity top;
+    private volatile String stage="starting";
     private final JSONArray steps=new JSONArray(); private final JSONArray checks=new JSONArray();
     private String projectId,pageId; private int sequence;
     interface Task {void run()throws Exception;}
@@ -30,11 +31,13 @@ public final class UiRunner extends Instrumentation {
     private int id(String name){return target.getResources().getIdentifier(name,"id",target.getPackageName());}
     private Object field(Object value,String name)throws Exception{Field f=value.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(value);}
     private Object call(Object value,String name)throws Exception{return value.getClass().getMethod(name).invoke(value);}
-    private void main(Runnable r){runOnMainSync(r);waitForIdleSync();}
+    private void main(Runnable r){runOnMainSync(r);SystemClock.sleep(80);}
     private void waitActivity(String suffix)throws Exception{long deadline=SystemClock.uptimeMillis()+20000;while(SystemClock.uptimeMillis()<deadline){if(top!=null&&top.getClass().getName().endsWith(suffix))return;SystemClock.sleep(150);}throw new AssertionError("Expected "+suffix+"; current="+(top==null?"none":top.getClass().getName()));}
     private Activity launch(String name,Intent extras)throws Exception{
         Intent i=extras==null?new Intent():extras;i.setClassName(target,name);i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Activity a=startActivitySync(i);top=a;waitForIdleSync();SystemClock.sleep(600);return a;
+        // startActivitySync waits for a globally idle UI; animated welcome and
+        // original shimmer widgets keep posting frames. Wait for lifecycle instead.
+        stage="launch:"+name;main(()->target.startActivity(i));waitActivity(name.substring(name.lastIndexOf('.')+1));SystemClock.sleep(600);return top;
     }
     private View view(String name){return top.findViewById(id(name));}
     private void click(String name)throws Exception{
@@ -43,7 +46,7 @@ public final class UiRunner extends Instrumentation {
     }
     private void set(String name,String value)throws Exception{View v=view(name);if(!(v instanceof EditText))throw new AssertionError("Missing input "+name);main(()->((EditText)v).setText(value));}
     private void keyboard(){main(()->{View v=top.getCurrentFocus();if(v!=null)((InputMethodManager)top.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(v.getWindowToken(),0);});SystemClock.sleep(200);}
-    private void back(){sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);waitForIdleSync();SystemClock.sleep(350);}
+    private void back(){sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);SystemClock.sleep(350);}
     private void write(String name,String value)throws Exception{try(FileOutputStream f=new FileOutputStream(new File(out,name))){f.write(value.getBytes(StandardCharsets.UTF_8));}}
     private JSONObject tree(View v)throws Exception{
         JSONObject j=new JSONObject().put("class",v.getClass().getSimpleName()).put("visible",v.getVisibility()).put("enabled",v.isEnabled());
@@ -52,13 +55,15 @@ public final class UiRunner extends Instrumentation {
         if(v instanceof ViewGroup){JSONArray a=new JSONArray();for(int i=0;i<((ViewGroup)v).getChildCount();i++)a.put(tree(((ViewGroup)v).getChildAt(i)));j.put("children",a);}return j;
     }
     private void capture(String name,String operation)throws Exception{
-        waitForIdleSync();SystemClock.sleep(350);String stem=String.format(Locale.ROOT,"%03d-%s",++sequence,name);
+        stage="capture:"+name;SystemClock.sleep(350);String stem=String.format(Locale.ROOT,"%03d-%s",++sequence,name);
         Bitmap b=getUiAutomation().takeScreenshot();if(b==null)throw new AssertionError("Screenshot unavailable");
         try(FileOutputStream f=new FileOutputStream(new File(out,stem+".png"))){if(!b.compress(Bitmap.CompressFormat.PNG,100,f))throw new AssertionError("Screenshot write");}finally{b.recycle();}
         final JSONObject[] hierarchy={null};main(()->{try{hierarchy[0]=tree(top.getWindow().getDecorView());}catch(Exception e){throw new RuntimeException(e);}});write(stem+".json",hierarchy[0].toString(2));
         steps.put(new JSONObject().put("screen",name).put("activity",top.getClass().getName()).put("operation",operation).put("file",stem+".png").put("hierarchy",stem+".json").put("status","captured"));
+        android.util.Log.i("CookiesUi",stage);write("ui-progress.json",new JSONObject().put("stage",stage).put("steps",steps).put("checks",checks).toString(2));
     }
     private void attempt(String name,Task task)throws Exception{
+        stage="check:"+name;android.util.Log.i("CookiesUi",stage);
         try{task.run();checks.put(new JSONObject().put("name",name).put("status","pass"));}
         catch(Throwable e){Throwable cause=e;while(cause.getCause()!=null)cause=cause.getCause();checks.put(new JSONObject().put("name",name).put("status","fail").put("error",cause.toString()));try{capture("failure-"+name,"Diagnostic after failure");}catch(Throwable ignored){} }
     }
@@ -88,11 +93,11 @@ public final class UiRunner extends Instrumentation {
         for(int step=0;step<20;step++){int count=step==0?1:2;int action=step==0?MotionEvent.ACTION_DOWN:step==1?(MotionEvent.ACTION_POINTER_DOWN|(1<<MotionEvent.ACTION_POINTER_INDEX_SHIFT)):step==18?(MotionEvent.ACTION_POINTER_UP|(1<<MotionEvent.ACTION_POINTER_INDEX_SHIFT)):step==19?MotionEvent.ACTION_UP:MotionEvent.ACTION_MOVE;if(step==19)count=1;
             MotionEvent.PointerCoords[] coords=new MotionEvent.PointerCoords[count];float radius=35+Math.min(step,17)*4;for(int i=0;i<count;i++){coords[i]=new MotionEvent.PointerCoords();coords[i].x=cx+(i==0?-radius:radius);coords[i].y=cy;coords[i].pressure=1;coords[i].size=1;}
             MotionEvent e=MotionEvent.obtain(start,SystemClock.uptimeMillis(),action,count,props,coords,0,0,1,1,0,0,InputDevice.SOURCE_TOUCHSCREEN,0);sendPointerSync(e);e.recycle();SystemClock.sleep(18);
-        }waitForIdleSync();
+        }SystemClock.sleep(200);
     }
     private void drawStroke(View v)throws Exception{
         int[] pos=new int[2];main(()->v.getLocationOnScreen(pos));float x=pos[0]+v.getWidth()*.35f,y=pos[1]+v.getHeight()*.4f;long start=SystemClock.uptimeMillis();
-        for(int i=0;i<20;i++){int action=i==0?MotionEvent.ACTION_DOWN:i==19?MotionEvent.ACTION_UP:MotionEvent.ACTION_MOVE;MotionEvent e=MotionEvent.obtain(start,SystemClock.uptimeMillis(),action,x+i*5,y+(float)Math.sin(i*.22)*25,0);sendPointerSync(e);e.recycle();SystemClock.sleep(12);}waitForIdleSync();
+        for(int i=0;i<20;i++){int action=i==0?MotionEvent.ACTION_DOWN:i==19?MotionEvent.ACTION_UP:MotionEvent.ACTION_MOVE;MotionEvent e=MotionEvent.obtain(start,SystemClock.uptimeMillis(),action,x+i*5,y+(float)Math.sin(i*.22)*25,0);sendPointerSync(e);e.recycle();SystemClock.sleep(12);}SystemClock.sleep(200);
     }
     private float[] matrix(Object canvas)throws Exception{Matrix m=(Matrix)call(canvas,"getCurrentMatrix");float[] result=new float[9];m.getValues(result);return result;}
     private void closePanels(Activity editor)throws Exception{Object panels=field(editor,"panelsController");main(()->{try{call(panels,"closeAllPanels");}catch(Exception e){throw new RuntimeException(e);}});}
@@ -136,7 +141,7 @@ public final class UiRunner extends Instrumentation {
             attempt("network-isolated",()->{if(target.getPackageManager().checkPermission("android.permission.INTERNET",target.getPackageName())!=PackageManager.PERMISSION_DENIED)throw new AssertionError("Network permission still granted");});
             attempt("local-account-authentication",()->accountChecks());
             launch("com.cookies.editor.local.WelcomeActivity",null);capture("welcome","Actual redesigned welcome screen");SystemClock.sleep(900);capture("welcome-motion","Second actual animation frame");
-            attempt("welcome-email-entry",()->{final Activity a=top;main(()->{((EditText)a.findViewById(0xc001)).setText("ui-fixture@example.invalid");((EditText)a.findViewById(0xc002)).setText("cookies-ui-3481");a.findViewById(0xc003).requestRectangleOnScreen(new Rect(0,0,300,60),true);});capture("local-sign-up","Local email/password form; password masked");main(()->a.findViewById(0xc003).performClick());waitActivity("ProjectsActivity");capture("dashboard","Reached original dashboard through local profile");});
+            attempt("welcome-email-entry",()->{final Activity a=top;main(()->a.findViewById(0xc005).performClick());Dialog dialog=(Dialog)field(a,"authDialog");SystemClock.sleep(350);capture("local-sign-in-sheet","Opened the local email/password bottom sheet");main(()->{((EditText)dialog.findViewById(0xc001)).setText("ui-fixture@example.invalid");((EditText)dialog.findViewById(0xc002)).setText("cookies-ui-3481");dialog.findViewById(0xc003).requestRectangleOnScreen(new Rect(0,0,300,60),true);});capture("local-sign-up","Local email/password form; password masked");main(()->dialog.findViewById(0xc003).performClick());waitActivity("ProjectsActivity");capture("dashboard","Reached original dashboard through local profile");});
             attempt("editor-workflow",()->editorWorkflow());
             screen("ui.library.FontLibraryActivity","font-library");screen("ui.library.ArabicFontsActivity","arabic-fonts");screen("ui.library.EnglishFontsActivity","english-fonts");screen("ui.library.ImportedFontsActivity","imported-fonts");screen("ui.floatingwidget.FolatingWidgetDashboard","floating-assistant");screen("ui.settings.SettingsActivity","settings-local-profile");
             screen("ui.dashboard.StoreActivity","store-disabled-preview");screen("ui.community.CommunityActivity","community-disabled-preview");screen("ui.community.CreatePostActivity","create-post-disabled-preview");screen("ui.dashboard.WebtoonScraperActivity","webtoon-disabled-preview");

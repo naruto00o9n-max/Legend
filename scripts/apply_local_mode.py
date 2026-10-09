@@ -5,6 +5,10 @@ ANDROID = '{http://schemas.android.com/apk/res/android}'
 
 def apply(decoded):
     decoded=pathlib.Path(decoded); changes=[]
+    protected={str(p.relative_to(decoded)):hashlib.sha256(p.read_bytes()).hexdigest()
+               for p in decoded.glob('smali*/com/oneguystudio/ytyper/ui/editor/**/*.smali')}
+    protected.update({str(p.relative_to(decoded)):hashlib.sha256(p.read_bytes()).hexdigest()
+                      for p in decoded.glob('smali*/com/oneguystudio/ytyper/data/model/**/*.smali')})
     def source(name):
         matches=list(decoded.glob('smali*/com/oneguystudio/ytyper/'+name+'.smali'))
         assert len(matches)==1,(name,len(matches))
@@ -18,6 +22,8 @@ def apply(decoded):
     noop='    .locals 0\n    return-void'
     for method in ['forceSyncFcmToken()V','trackActivityAndScheduleWorkers()V']:
         replace('ui/dashboard/ProjectsActivity',method,noop)
+    for method in ['executeBackup(Lcom/oneguystudio/ytyper/data/model/ProjectMeta;)V','showElegantCloudProjectsDialog()V']:
+        replace('ui/dashboard/ProjectsActivity',method,'    .locals 0\n    invoke-static {p0}, Lcom/cookies/editor/local/OfflineBridge;->unavailable(Landroid/content/Context;)V\n    return-void')
     replace('data/UpdateChecker','checkForUpdates(Landroid/app/Activity;)V',noop)
     for method in ['pushSettingsJava(Landroid/content/Context;)V','syncPendingBubblesJava(Landroid/content/Context;)V','updateFcmTokenJava(Ljava/lang/String;)V']:
         replace('utils/CloudSyncManager',method,noop)
@@ -56,7 +62,8 @@ def apply(decoded):
             application.remove(el)
     ET.register_namespace('android',ANDROID[1:-1]);tree.write(manifest,encoding='utf-8',xml_declaration=True)
     # Ensure editor, drawing, transform, fonts, and purchase entitlement instructions are untouched by this script.
-    report={'mode':'device-local','network_permission':False,'google_login_enabled':False,'password_storage':'salted PBKDF2-HMAC-SHA256; API24-25 HMAC-SHA1 fallback','backend_credentials_used':False,'entitlements_modified':False,'editor_engine_modified':False,'online_screens':'disabled original-layout previews','changes':changes}
+    assert all(hashlib.sha256((decoded/path).read_bytes()).hexdigest()==digest for path,digest in protected.items()),'Protected editor/model instructions changed'
+    report={'mode':'device-local','network_permission':False,'google_login_enabled':False,'password_storage':'salted PBKDF2-HMAC-SHA256; API24-25 HMAC-SHA1 fallback','backend_credentials_used':False,'entitlements_modified':False,'editor_engine_modified':False,'protected_editor_model_files_checked':len(protected),'online_screens':'disabled original-layout previews','changes':changes}
     (decoded/'cookies-local-mode.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
     print(f'Offline mode: {len(changes)} narrow method hooks; networking removed; editor and entitlements unchanged.')
 
