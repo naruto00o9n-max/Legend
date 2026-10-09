@@ -43,6 +43,8 @@ def brand(decoded):
             # Compose's title is not in XML resources; change display literals only.
             text=text.replace('const-string v6, "Y"','const-string v6, "🍪"')
             text=text.replace('const-string v6, "Typer"','const-string v6, "Cookies"')
+            text=text.replace('"Login with Google"','"تسجيل الدخول باستخدام Google"')
+            text=text.replace('"Please sign in to continue."','"سجّل الدخول للمتابعة."')
             text=text.replace('0xff64ffdaL','0xffd4af37L')
         if text!=original:file.write_text(text);changed.append(str(file.relative_to(decoded)))
     for density,size,foreground in [('mdpi',48,108),('hdpi',72,162),('xhdpi',96,216),('xxhdpi',144,324),('xxxhdpi',192,432)]:

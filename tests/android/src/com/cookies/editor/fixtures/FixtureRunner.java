@@ -89,6 +89,7 @@ public final class FixtureRunner extends Instrumentation {
         property(value,"textContent","هذا حوار عربي\nداخل فقاعة المانهوا");
         property(value,"fontPath",font);property(value,"typeface",Typeface.createFromAsset(target.getAssets(),"fonts/"+font));
         property(value,"fontSize",32f);property(value,"boxWidth",260f);
+        property(value,"strokeWidth",0f);
         property(value,"x",256f);property(value,"y",256f);
         property(value,"color",Color.BLACK);property(value,"opacity",255);
         property(value,"isVisible",true);property(value,"scaleX",1f);property(value,"scaleY",1f);

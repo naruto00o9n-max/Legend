@@ -2,6 +2,7 @@ name: Android reference reconstruction and image core verification
 on:
   push:
     branches: [main]
+    paths-ignore: ['docs/**', 'README.md', 'AGENTS.md']
   workflow_dispatch:
 permissions:
   contents: read
@@ -51,6 +52,13 @@ jobs:
           mkdir -p .work
           swiftc ios/Engine/Typesetter.swift tests/typography_checks.swift -o .work/test-typesetter
           .work/test-typesetter
+      - name: Compile native port components for iPhone devices
+        run: ./scripts/build_ios_components.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-port-components
+          path: build/ios-components/
+          retention-days: 14
 
   android-render-fixtures:
     needs: reference
@@ -104,7 +112,7 @@ jobs:
         run: |
           mkdir -p .work/fonts build/font-parity
           unzip -q -o build/cookies-reference-unsigned.apk 'assets/fonts/*' -d .work/fonts
-          swiftc ios/Engine/Typesetter.swift tests/coretext_metrics.swift -o .work/font-audit
+          swiftc ios/Engine/Typesetter.swift ios/Engine/CoreTextMeasure.swift tests/coretext_metrics.swift -o .work/font-audit
           .work/font-audit .work/android-results/reference-fixtures/typography-android.json .work/fonts/assets/fonts build/font-parity/coretext-comparison.json
       - uses: actions/upload-artifact@v4
         if: always()
