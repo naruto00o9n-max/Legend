@@ -1,0 +1,14 @@
+{
+  "source_sha256": "56ed425f56d0d8614c39ad3e0a50f4eb3528e35676b1f4dc49bbfced4b033e3b",
+  "pristine_roundtrip_sha256": "52505e27d3596c81264daa833248d108b83771d0fa652ab08c12feb6d17e661e",
+  "asset_and_native_entries": 63,
+  "changed_asset_and_native_entries": [],
+  "original_dex_sizes": {
+    "classes.dex": 9657420,
+    "classes2.dex": 2792800
+  },
+  "rebuilt_dex_sizes": {
+    "classes2.dex": 3195400,
+    "classes.dex": 11076580
+  }
+}

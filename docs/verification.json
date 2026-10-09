@@ -1,0 +1,66 @@
+{
+  "pixel_core": {
+    "dimensions": [
+      800,
+      15000
+    ],
+    "decoded_rgba_bytes_compared": 48000000,
+    "memory_limit_bytes": 67108864,
+    "result": "pass",
+    "platform": "Linux execution of portable C core intended for iOS",
+    "coverage": "8-bit PNG input; all decoded pixel channels including hidden RGB; source dimensions; lower edge sampled tile; transparent and opaque compositing",
+    "does_not_verify": [
+      "iPhone runtime",
+      "JPEG support",
+      "16-bit editing",
+      "UI interactions",
+      "PSD output",
+      "editor render parity"
+    ]
+  },
+  "typesetter": {
+    "result": "pass",
+    "compiler": "Swift 6.2 Linux",
+    "coverage": [
+      "whitespace normalization",
+      "box/circle balancing",
+      "orphan-word handling",
+      "source character conservation",
+      "Arabic combining-mark conservation",
+      "Kotlin-compatible NBSP normalization"
+    ],
+    "measurement": "injected deterministic width, not Android Paint or Apple CoreText",
+    "android_glyph_layout_parity": "not verified"
+  },
+  "android_runtime": {
+    "result": "blocked in local software emulator",
+    "boot": "Android 30 x86_64 software emulation with ARM native translation; no /dev/kvm",
+    "error": "Package service connection broke (Broken pipe 32) and installations timed out; software emulator also showed a System UI ANR. No Cookies app crash is established.",
+    "app_crash_proven": false,
+    "sign_in": "not attempted against original developer services",
+    "screenshot_evidence": "launch-screen.png: System UI is not responding, before Cookies application launch",
+    "environment_retry": "Lower resolution and longer hardware timeout allowed boot; APK installation still did not complete.",
+    "local_emulator_stopped": true
+  },
+  "github": {
+    "repository_created": false,
+    "actions_started": false,
+    "reason": "awaiting account selection/new repository URL; connected naruto tools do not expose create-repository"
+  },
+  "ios": {
+    "editor_app_implemented": false,
+    "unsigned_ipa_built": false
+  },
+  "android_instrumentation": {
+    "compilation": "pass against Android SDK 36",
+    "execution": "not yet run",
+    "planned_cases": "original font measurements and dialogue layout, nine text effects, twenty shapes, stroke/shadow/spacing/gradient/rotation",
+    "target": "actual restored renderer, not decompiled Java stubs"
+  },
+  "coretext_comparison": {
+    "source_prepared": true,
+    "compilation": "requires macOS; not run here",
+    "execution": "not yet run",
+    "failure_on_formatting_mismatch": true
+  }
+}

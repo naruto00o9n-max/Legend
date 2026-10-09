@@ -1,0 +1,11 @@
+.work/
+build/
+DerivedData/
+*.apk
+*.ipa
+*.jks
+*.keystore
+*.log
+.DS_Store
+__pycache__/
+*.pyc

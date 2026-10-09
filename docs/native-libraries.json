@@ -1,0 +1,106 @@
+[
+  {
+    "name": "libandroidx.graphics.path.so",
+    "size": 10096,
+    "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+    "defined_dynamic_symbols": 1,
+    "jni_entry_points": [
+      "JNI_OnLoad@@LIBANDROIDX.GRAPHICS.PATH"
+    ]
+  },
+  {
+    "name": "libc++_shared.so",
+    "size": 911696,
+    "sha256": "af729ee868913bb298b7360939ba31865372222646edddcfa4ed9bca6484bf1c",
+    "defined_dynamic_symbols": 2195,
+    "jni_entry_points": []
+  },
+  {
+    "name": "libdatastore_shared_counter.so",
+    "size": 7112,
+    "sha256": "d3e48717c9aa147e0ab21063ba0e8e0211cabf8bf40b222640829519edbf58e1",
+    "defined_dynamic_symbols": 9,
+    "jni_entry_points": [
+      "Java_androidx_datastore_core_NativeSharedCounter_nativeCreateSharedCounter",
+      "Java_androidx_datastore_core_NativeSharedCounter_nativeGetCounterValue",
+      "Java_androidx_datastore_core_NativeSharedCounter_nativeIncrementAndGetCounterValue",
+      "Java_androidx_datastore_core_NativeSharedCounter_nativeTruncateFile"
+    ]
+  },
+  {
+    "name": "libopencv_java4.so",
+    "size": 17189512,
+    "sha256": "82ac6774835e26fbaba896bf2f6f61e81200dfdb5fe55a53e43b54241de41a0a",
+    "defined_dynamic_symbols": 6812,
+    "jni_entry_points": [
+      "JNI_OnLoad",
+      "Java_org_opencv_android_Utils_nBitmapToMat",
+      "Java_org_opencv_android_Utils_nBitmapToMat2",
+      "Java_org_opencv_android_Utils_nMatToBitmap",
+      "Java_org_opencv_android_Utils_nMatToBitmap2",
+      "Java_org_opencv_calib3d_Calib3d_RQDecomp3x3_10",
+      "Java_org_opencv_calib3d_Calib3d_RQDecomp3x3_11",
+      "Java_org_opencv_calib3d_Calib3d_RQDecomp3x3_12",
+      "Java_org_opencv_calib3d_Calib3d_RQDecomp3x3_13",
+      "Java_org_opencv_calib3d_Calib3d_Rodrigues_10",
+      "Java_org_opencv_calib3d_Calib3d_Rodrigues_11",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCameraExtended_10",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCameraExtended_11",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCameraExtended_12",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCameraROExtended_10",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCameraROExtended_11",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCameraROExtended_12",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCameraRO_10",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCameraRO_11",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCameraRO_12",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCamera_10",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCamera_11",
+      "Java_org_opencv_calib3d_Calib3d_calibrateCamera_12",
+      "Java_org_opencv_calib3d_Calib3d_calibrateHandEye_10",
+      "Java_org_opencv_calib3d_Calib3d_calibrateHandEye_11",
+      "Java_org_opencv_calib3d_Calib3d_calibrateRobotWorldHandEye_10",
+      "Java_org_opencv_calib3d_Calib3d_calibrateRobotWorldHandEye_11",
+      "Java_org_opencv_calib3d_Calib3d_calibrationMatrixValues_10",
+      "Java_org_opencv_calib3d_Calib3d_checkChessboard_10",
+      "Java_org_opencv_calib3d_Calib3d_composeRT_10",
+      "Java_org_opencv_calib3d_Calib3d_composeRT_11",
+      "Java_org_opencv_calib3d_Calib3d_composeRT_12",
+      "Java_org_opencv_calib3d_Calib3d_composeRT_13",
+      "Java_org_opencv_calib3d_Calib3d_composeRT_14",
+      "Java_org_opencv_calib3d_Calib3d_composeRT_15",
+      "Java_org_opencv_calib3d_Calib3d_composeRT_16",
+      "Java_org_opencv_calib3d_Calib3d_composeRT_17",
+      "Java_org_opencv_calib3d_Calib3d_composeRT_18",
+      "Java_org_opencv_calib3d_Calib3d_computeCorrespondEpilines_10",
+      "Java_org_opencv_calib3d_Calib3d_convertPointsFromHomogeneous_10"
+    ]
+  },
+  {
+    "name": "libquickjs.so",
+    "size": 854224,
+    "sha256": "b1cbb6a134d9def33e234bfc019c4c83df853435017ab5d0f066a65cb0ab8713",
+    "defined_dynamic_symbols": 393,
+    "jni_entry_points": [
+      "Java_app_cash_quickjs_QuickJs_call",
+      "Java_app_cash_quickjs_QuickJs_compile",
+      "Java_app_cash_quickjs_QuickJs_createContext",
+      "Java_app_cash_quickjs_QuickJs_destroyContext",
+      "Java_app_cash_quickjs_QuickJs_evaluate__JLjava_lang_String_2Ljava_lang_String_2",
+      "Java_app_cash_quickjs_QuickJs_execute",
+      "Java_app_cash_quickjs_QuickJs_get",
+      "Java_app_cash_quickjs_QuickJs_set"
+    ]
+  },
+  {
+    "name": "libtranslate_jni.so",
+    "size": 16361032,
+    "sha256": "45040ff0cdd194d6e601589d759e6f1ba733de5f95790f76cc3e2046919046be",
+    "defined_dynamic_symbols": 8,
+    "jni_entry_points": [
+      "JNI_OnLoad@@VERS_1.0",
+      "Java_com_google_mlkit_nl_translate_internal_TranslateJni_nativeDestroy@@VERS_1.0",
+      "Java_com_google_mlkit_nl_translate_internal_TranslateJni_nativeInit@@VERS_1.0",
+      "Java_com_google_mlkit_nl_translate_internal_TranslateJni_nativeTranslate@@VERS_1.0"
+    ]
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "identical_smali_classes": 13207,
+  "changed_smali_classes": [
+    "smali/com/oneguystudio/ytyper/utils/ThemeUtils.smali",
+    "smali/com/oneguystudio/ytyper/data/Prefs.smali",
+    "smali/com/oneguystudio/ytyper/ui/dashboard/SplashActivityKt.smali"
+  ],
+  "engine_and_canvas_classes_changed": []
+}

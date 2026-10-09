@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.cookies.editor.fixtures">
+  <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="36" />
+  <application android:label="Cookies Reference Fixtures" android:debuggable="true" />
+  <instrumentation android:name="com.cookies.editor.fixtures.FixtureRunner" android:targetPackage="com.cookies.editor" android:functionalTest="true" />
+</manifest>

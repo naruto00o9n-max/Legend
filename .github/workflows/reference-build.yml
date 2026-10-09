@@ -1,0 +1,111 @@
+name: Android reference reconstruction and image core verification
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install image asset packaging tool
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y imagemagick
+          if ! command -v magick >/dev/null; then
+            sudo ln -s /usr/bin/convert /usr/local/bin/magick
+          fi
+      - name: Verify 800x15000 PNG core
+        run: ./scripts/test_pixel_core.sh
+      - uses: android-actions/setup-android@v3
+      - name: Prepare Android compiler tools
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Reconstruct pinned Android reference
+        run: ./scripts/build_android_reference.sh
+      - name: Build instrumentation fixtures and sign study APKs
+        run: |
+          ./scripts/build_android_fixtures.sh
+          ./scripts/sign_android_study.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cookies-android-reference-study
+          path: build/
+          retention-days: 14
+  typography:
+    runs-on: macos-15
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify recovered typography algorithm
+        run: |
+          mkdir -p .work
+          swiftc ios/Engine/Typesetter.swift tests/typesetter.swift -o .work/test-typesetter
+          .work/test-typesetter
+
+  android-render-fixtures:
+    needs: reference
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/download-artifact@v4
+        with:
+          name: cookies-android-reference-study
+          path: build
+      - name: Enable emulator hardware acceleration
+        run: |
+          test -e /dev/kvm
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          ram-size: 2048M
+          disable-animations: true
+          emulator-options: -no-window -no-audio -no-snapshot -no-boot-anim -gpu swiftshader_indirect -dns-server 127.0.0.1
+          script: ./scripts/run_android_fixtures.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-renderer-and-font-fixtures
+          path: build/runtime/
+          retention-days: 14
+
+  coretext-font-parity:
+    needs: android-render-fixtures
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-renderer-and-font-fixtures
+          path: .work/android-results
+      - uses: actions/download-artifact@v4
+        with:
+          name: cookies-android-reference-study
+          path: build
+      - name: Compare original Android font formatting against CoreText
+        run: |
+          mkdir -p .work/fonts build/font-parity
+          unzip -q -o build/cookies-reference-unsigned.apk 'assets/fonts/*' -d .work/fonts
+          swiftc ios/Engine/Typesetter.swift tests/coretext_metrics.swift -o .work/font-audit
+          .work/font-audit .work/android-results/reference-fixtures/typography-android.json .work/fonts/assets/fonts build/font-parity/coretext-comparison.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coretext-font-parity-report
+          path: build/font-parity/
+          retention-days: 14

@@ -1,0 +1,10 @@
+{
+  "display_name": "Cookies Editor",
+  "arabic_name": "كوكيز إيدتور",
+  "package_name": "com.cookies.editor",
+  "accent": "#D4AF37",
+  "background": "#0A0A0A",
+  "source_version": "YTyper 3.8",
+  "source_sha256": "56ed425f56d0d8614c39ad3e0a50f4eb3528e35676b1f4dc49bbfced4b033e3b",
+  "default_language": "ar"
+}
