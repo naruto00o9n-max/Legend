@@ -6,12 +6,10 @@ TASK_TOOLS="$TASK_SDK/build-tools/36.0.0"
 TASK_PLATFORM="$TASK_SDK/platforms/android-36/android.jar"
 TASK_WORK="$PWD/.work/fixtures"
 mkdir -p "$TASK_WORK/classes" "$TASK_WORK/dex" build
-if command -v javac >/dev/null; then
-  javac -source 8 -target 8 -bootclasspath "$TASK_PLATFORM" -d "$TASK_WORK/classes" tests/android/src/com/cookies/editor/fixtures/FixtureRunner.java
-else
-  java -m jdk.compiler/com.sun.tools.javac.Main -source 8 -target 8 -bootclasspath "$TASK_PLATFORM" -d "$TASK_WORK/classes" tests/android/src/com/cookies/editor/fixtures/FixtureRunner.java
-fi
-"$TASK_TOOLS/d8" --min-api 24 --lib "$TASK_PLATFORM" --output "$TASK_WORK/dex" "$TASK_WORK/classes/com/cookies/editor/fixtures/FixtureRunner.class"
+find tests/android/src -name '*.java' > "$TASK_WORK/sources.txt"
+java -m jdk.compiler/com.sun.tools.javac.Main -source 8 -target 8 -classpath "$TASK_PLATFORM" -d "$TASK_WORK/classes" @"$TASK_WORK/sources.txt"
+find "$TASK_WORK/classes" -name '*.class' > "$TASK_WORK/classes.txt"
+"$TASK_TOOLS/d8" --min-api 24 --lib "$TASK_PLATFORM" --output "$TASK_WORK/dex" @"$TASK_WORK/classes.txt"
 "$TASK_TOOLS/aapt2" link -I "$TASK_PLATFORM" --manifest tests/android/AndroidManifest.xml -o "$TASK_WORK/fixtures-base.apk" --min-sdk-version 24 --target-sdk-version 36
 python3 - "$TASK_WORK" <<'PY'
 import pathlib, sys, zipfile

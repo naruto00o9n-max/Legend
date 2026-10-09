@@ -2,4 +2,5 @@
   <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="36" />
   <application android:label="Cookies Reference Fixtures" android:debuggable="true" />
   <instrumentation android:name="com.cookies.editor.fixtures.FixtureRunner" android:targetPackage="com.cookies.editor" android:functionalTest="true" />
+  <instrumentation android:name="com.cookies.editor.fixtures.UiRunner" android:targetPackage="com.cookies.editor" android:functionalTest="true" />
 </manifest>

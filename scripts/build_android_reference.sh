@@ -10,6 +10,8 @@ if [[ ! -f "$TASK_TOOL" ]]; then
 fi
 java -Xmx3g -jar "$TASK_TOOL" d --force "$TASK_WORK/reference.apk" -o "$TASK_WORK/decoded"
 python3 scripts/brand_android.py "$TASK_WORK/decoded"
+COOKIES_APKTOOL="$TASK_TOOL" ./scripts/build_local_welcome.sh "$TASK_WORK/decoded"
 java -Xmx3g -jar "$TASK_TOOL" b "$TASK_WORK/decoded" -o build/cookies-reference-unsigned.apk
 cp "$TASK_WORK/decoded/cookies-brand-changes.json" build/
+cp "$TASK_WORK/decoded/cookies-local-mode.json" build/
 python3 scripts/verify_android_reference.py "$TASK_WORK/reference.apk" build/cookies-reference-unsigned.apk build/android-validation.json

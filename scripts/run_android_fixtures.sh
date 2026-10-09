@@ -43,6 +43,6 @@ print('Actual original Android renderer cases:',r['renderCases'])
 print('iOS image/glyph parity has not been evaluated by this Android test.')
 PY
 
-# Observe the actual launcher offline; this does not sign in or bypass its gates.
-adb shell am start -W -n com.cookies.editor/com.oneguystudio.ytyper.ui.dashboard.SplashActivity > build/runtime/launcher-start.txt
+# Observe the new local launcher; editor bytecode and paid entitlements are preserved.
+adb shell am start -W -n com.cookies.editor/com.cookies.editor.local.WelcomeActivity > build/runtime/launcher-start.txt
 sleep 3
