@@ -140,9 +140,9 @@ public final class UiRunner extends Instrumentation {
         MotionEvent.PointerProperties[] props={new MotionEvent.PointerProperties(),new MotionEvent.PointerProperties()};for(int i=0;i<2;i++){props[i].id=i;props[i].toolType=MotionEvent.TOOL_TYPE_FINGER;}
         long start=SystemClock.uptimeMillis();
         for(int step=0;step<20;step++){int count=step==0?1:2;int action=step==0?MotionEvent.ACTION_DOWN:step==1?(MotionEvent.ACTION_POINTER_DOWN|(1<<MotionEvent.ACTION_POINTER_INDEX_SHIFT)):step==18?(MotionEvent.ACTION_POINTER_UP|(1<<MotionEvent.ACTION_POINTER_INDEX_SHIFT)):step==19?MotionEvent.ACTION_UP:MotionEvent.ACTION_MOVE;if(step==19)count=1;
-            MotionEvent.PointerCoords[] coords=new MotionEvent.PointerCoords[count];float radius=35+Math.min(step,17)*4;for(int i=0;i<count;i++){coords[i]=new MotionEvent.PointerCoords();coords[i].x=cx+(i==0?-radius:radius);coords[i].y=cy;coords[i].pressure=1;coords[i].size=1;}
+            MotionEvent.PointerCoords[] coords=new MotionEvent.PointerCoords[count];float radius=25+Math.min(step,17)*(Math.min(v.getWidth()*.42f,135)-25)/17f;for(int i=0;i<count;i++){coords[i]=new MotionEvent.PointerCoords();coords[i].x=cx+(i==0?-radius:radius);coords[i].y=cy;coords[i].pressure=1;coords[i].size=1;}
             MotionEvent e=MotionEvent.obtain(start,SystemClock.uptimeMillis(),action,count,props,coords,0,0,1,1,0,0,InputDevice.SOURCE_TOUCHSCREEN,0);sendPointerSync(e);e.recycle();SystemClock.sleep(18);
-        }SystemClock.sleep(200);
+        }SystemClock.sleep(450);
     }
     private void drawStroke(View v)throws Exception{
         int[] pos=new int[2];main(()->v.getLocationOnScreen(pos));float x=pos[0]+v.getWidth()*.35f,y=pos[1]+v.getHeight()*.4f;long start=SystemClock.uptimeMillis();
@@ -159,8 +159,10 @@ public final class UiRunner extends Instrumentation {
         Activity editor=top;Object manager=field(editor,"pageManager");projectId=(String)call(manager,"getProjectId");pageId=(String)call(manager,"getPageId");capture("editor-long-image","Long source loaded in original canvas");
         View canvas=view("editorCanvas");float[] before=matrix(canvas);pinch(canvas);float[] after=matrix(canvas);if(Arrays.equals(before,after))throw new AssertionError("Pinch did not change canvas matrix");capture("editor-pinch-zoom","Two-finger pointer sequence changed canvas transform");
         float fitWidth=(canvas.getWidth()-24f)/((Number)call(canvas,"getActualBgWidth")).floatValue();
-        for(int n=0;n<6&&Math.abs(matrix(canvas)[Matrix.MSCALE_X])<fitWidth;n++)pinch(canvas);
-        if(Math.abs(matrix(canvas)[Matrix.MSCALE_X])<fitWidth*.8f)throw new AssertionError("Pinch did not reach page reading width");
+        JSONArray zooms=new JSONArray();zooms.put(matrix(canvas)[Matrix.MSCALE_X]);
+        for(int n=0;n<16&&Math.abs(matrix(canvas)[Matrix.MSCALE_X])<fitWidth;n++){pinch(canvas);zooms.put(matrix(canvas)[Matrix.MSCALE_X]);}
+        write("pinch-verification.json",new JSONObject().put("matrixScales",zooms).put("targetFitWidth",fitWidth).put("sourceWidth",call(canvas,"getActualBgWidth")).toString(2));
+        if(Math.abs(matrix(canvas)[Matrix.MSCALE_X])<fitWidth*.8f)throw new AssertionError("Pinch did not reach page reading width: "+zooms+" target="+fitWidth);
         capture("editor-reading-zoom","Repeated real pinch gestures to inspect a section of the long page");
         click("btnToolText");capture("text-added","Clicked original add-text action");
         if(view("etInlineInput")==null)throw new AssertionError("Inline text editor missing");set("etInlineInput","كوكيز إيدتور\nاختبار حوار عربي");keyboard();capture("arabic-text","Entered Arabic text in original editor");
