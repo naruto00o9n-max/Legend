@@ -15,6 +15,7 @@ adb shell svc data disable
 adb shell settings put global verifier_verify_adb_installs 0
 adb install --no-streaming -r build/cookies-reference-test.apk
 adb install --no-streaming -r build/cookies-fixtures-test.apk
+adb shell appops set com.cookies.editor SYSTEM_ALERT_WINDOW allow
 timeout 360 adb shell am instrument -w -r com.cookies.editor.fixtures/com.cookies.editor.fixtures.UiRunner > build/ui-runtime/instrumentation.txt
 adb pull /sdcard/Download/Cookies-ui/cookies-ui-evidence.zip build/ui-runtime/
 python3 - <<'PY'

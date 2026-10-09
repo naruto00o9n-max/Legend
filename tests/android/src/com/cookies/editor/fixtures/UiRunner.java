@@ -86,6 +86,29 @@ public final class UiRunner extends Instrumentation {
         auth.getMethod("signOut",Context.class).invoke(null,target);
         if(!"guest".equals(auth.getMethod("email",Context.class).invoke(null,target)))throw new AssertionError("Session not cleared");
     }
+    private void image(String name,Bitmap bitmap)throws Exception{File f=new File(out,name);try(FileOutputStream stream=new FileOutputStream(f)){if(!bitmap.compress(Bitmap.CompressFormat.PNG,100,stream))throw new IOException("PNG fixture");}publish(f);}
+    private void cleanerCheck()throws Exception{
+        if(!Boolean.TRUE.equals(type("org.opencv.android.OpenCVLoader").getMethod("initDebug").invoke(null)))throw new AssertionError("Original native OpenCV not loaded");
+        Bitmap source=Bitmap.createBitmap(400,400,Bitmap.Config.ARGB_8888),mask=Bitmap.createBitmap(400,400,Bitmap.Config.ARGB_8888),patch=null,composite=null;
+        try{Canvas c=new Canvas(source);c.drawColor(Color.WHITE);Paint p=new Paint(3);p.setColor(Color.BLACK);p.setTextAlign(Paint.Align.CENTER);p.setTextSize(40);c.drawText("COOKIES",200,220,p);
+            Canvas m=new Canvas(mask);m.drawColor(Color.BLACK);p.setColor(Color.WHITE);m.drawRect(75,165,325,235,p);
+            Object engine=type(BASE+"engine.OpenCVEngine").getConstructor().newInstance();patch=(Bitmap)engine.getClass().getMethod("removeTextAndInpaint",Bitmap.class,Bitmap.class,double.class).invoke(engine,source,mask,3d);
+            if(patch==null||patch.getWidth()!=400||patch.getHeight()!=400)throw new AssertionError("Native cleaner returned invalid patch");
+            int erased=0;for(int y=0;y<400;y++)for(int x=0;x<400;x++){int original=source.getPixel(x,y),pixel=patch.getPixel(x,y);if(Color.red(original)<80&&Color.alpha(pixel)>240&&Color.red(pixel)>230)erased++;if((x<70||x>330||y<160||y>240)&&Color.alpha(pixel)!=0)throw new AssertionError("Cleaner patch changed unmasked area");}
+            if(erased<300)throw new AssertionError("Native cleaner did not remove fixture lettering");
+            composite=source.copy(Bitmap.Config.ARGB_8888,true);new Canvas(composite).drawBitmap(patch,0,0,null);image("native-cleaner-before.png",source);image("native-cleaner-mask.png",mask);image("native-cleaner-after.png",composite);
+            write("native-cleaner-verification.json",new JSONObject().put("status","pass").put("erasedDarkPixels",erased).put("outsidePatchTransparent",true).put("scope","Actual original OpenCV patch engine; not every inpainting scenario").toString(2));
+        }finally{source.recycle();mask.recycle();if(patch!=null)patch.recycle();if(composite!=null)composite.recycle();}
+    }
+    private void overlayCheck()throws Exception{
+        // Foreground overlay permission is granted by the emulator script only.
+        target.getSharedPreferences("AshtyperPrefs",0).edit().putInt("TUTORIAL_MAIN_SHOWN",1).putBoolean("TUTORIAL_FLOATING",true).apply();
+        launch(BASE+"ui.floatingwidget.FolatingWidgetDashboard",null);set("editText","هذا حوار عربي تجريبي\nوهذه فقاعة ثانية");capture("assistant-dialogue-input","Entered local dialogue text for the floating assistant");click("button");waitActivity("ProjectsActivity");SystemClock.sleep(1300);
+        boolean running=false;for(ActivityManager.RunningServiceInfo service:((ActivityManager)target.getSystemService(Context.ACTIVITY_SERVICE)).getRunningServices(100))if(service.service.getClassName().endsWith("FloatingWidgetService"))running=true;
+        if(!running)throw new AssertionError("Original floating service did not start");capture("floating-window","Original floating service running above Cookies dashboard");
+        main(()->top.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS)));SystemClock.sleep(800);capture("floating-above-settings","Actual screenshot after opening Android Settings with the original overlay running");back();
+        Intent stop=new Intent().setClassName(target,BASE+"ui.floatingwidget.FloatingWidgetService");main(()->target.stopService(stop));SystemClock.sleep(400);
+    }
     private Uri sourceImage()throws Exception{
         Bitmap b=Bitmap.createBitmap(800,15000,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);c.drawColor(Color.WHITE);Paint p=new Paint(3);
         for(int y=0;y<15000;y+=750){p.setColor(y%1500==0?0xff161c25:0xff2c3137);c.drawRect(20,y+20,780,y+580,p);p.setColor(0xffa78e56);c.drawCircle(400,y+235,135,p);p.setColor(0xff141920);c.drawCircle(400,y+196,43,p);c.drawRoundRect(new RectF(325,y+239,475,y+480),60,60,p);p.setColor(Color.WHITE);c.drawOval(new RectF(480,y+55,735,y+190),p);p.setColor(Color.BLACK);p.setTextSize(25);p.setTextAlign(Paint.Align.CENTER);c.drawText("PAGE "+(y/750+1),610,y+128,p);}
@@ -116,9 +139,12 @@ public final class UiRunner extends Instrumentation {
         View page=view("iv_page_thumb");if(page==null)throw new AssertionError("Imported page absent");main(()->{View x=page;while(x!=null&&!x.isClickable())x=x.getParent() instanceof View?(View)x.getParent():null;if(x==null)throw new AssertionError("Page card not clickable");x.performClick();});waitActivity("EditorActivity");SystemClock.sleep(1400);
         Activity editor=top;Object manager=field(editor,"pageManager");projectId=(String)call(manager,"getProjectId");pageId=(String)call(manager,"getPageId");capture("editor-long-image","Long source loaded in original canvas");
         View canvas=view("editorCanvas");float[] before=matrix(canvas);pinch(canvas);float[] after=matrix(canvas);if(Arrays.equals(before,after))throw new AssertionError("Pinch did not change canvas matrix");capture("editor-pinch-zoom","Two-finger pointer sequence changed canvas transform");
+        float fitWidth=(canvas.getWidth()-24f)/((Number)call(canvas,"getActualBgWidth")).floatValue();
+        for(int n=0;n<5&&((Number)call(canvas,"getCanvasZoom")).floatValue()<fitWidth;n++)pinch(canvas);
+        capture("editor-reading-zoom","Repeated real pinch gestures to inspect a section of the long page");
         click("btnToolText");capture("text-added","Clicked original add-text action");
         if(view("etInlineInput")==null)throw new AssertionError("Inline text editor missing");set("etInlineInput","كوكيز إيدتور\nاختبار حوار عربي");keyboard();capture("arabic-text","Entered Arabic text in original editor");
-        attempt("text-size-control",()->{Object layer=call(canvas,"getActiveLayer");float size=((Number)call(layer,"getFontSize")).floatValue();click("btnToolFormat");click("btnSizePlus");float changed=((Number)call(layer,"getFontSize")).floatValue();if(changed<=size)throw new AssertionError("Font size control did not change model");capture("text-size-increased","Increased font size through original UI and verified model change");closePanels(editor);});
+        attempt("text-size-control",()->{Object layer=call(canvas,"getActiveLayer");float size=((Number)call(layer,"getFontSize")).floatValue();click("btnToolFormat");click("btnSizePlus");float changed=((Number)call(layer,"getFontSize")).floatValue();if(changed<=size)throw new AssertionError("Font size control did not change model");capture("text-size-increased","Increased font size through original UI and verified model change");set("etSize","48");capture("text-readable-size","Set text size through the original formatting input");closePanels(editor);});
         for(String[] panel:new String[][]{{"btnToolFont","font"},{"btnToolFormat","format"},{"btnToolColor","color"},{"btnToolStroke","stroke"},{"btnToolBackground","background"},{"btnToolShadow","shadow"},{"btnToolPosition","position"},{"btnToolSpacing","spacing"},{"btnTool3DRotate","3d"},{"btnToolPerspective","perspective"},{"btnToolEffects","effects"},{"btnToolTexture","texture"},{"btnToolOpacity","opacity"},{"btnToolStyles","styles"},{"btnToolEraser","eraser"}}){
             attempt("panel-"+panel[1],()->{top=editor;click(panel[0]);capture("text-panel-"+panel[1],"Opened original text control panel; panel capture is not exhaustive parameter verification");closePanels(editor);});
         }
@@ -137,8 +163,9 @@ public final class UiRunner extends Instrumentation {
         });
         attempt("export-studio",()->{Intent i=new Intent().putExtra("PROJECT_ID",projectId);launch(BASE+"ui.editor.ExportStudioActivity",i);capture("export-studio","Original page selection and export settings");});
         attempt("png-export-through-ui",()->{
+            click("btnSelectAll");capture("export-selected","Selected project pages for lossless export");
             long previous=0;try(android.database.Cursor c=target.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,new String[]{"_id"},null,null,"_id DESC")){if(c!=null&&c.moveToFirst())previous=c.getLong(0);}
-            click("btnSelectAll");capture("export-selected","Selected project pages for lossless export");click("btnStartExport");long deadline=SystemClock.uptimeMillis()+35000;Uri exported=null;
+            click("btnStartExport");long deadline=SystemClock.uptimeMillis()+35000;Uri exported=null;
             while(SystemClock.uptimeMillis()<deadline){try(android.database.Cursor c=target.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,new String[]{"_id","mime_type"},"_id > ?",new String[]{String.valueOf(previous)},"_id DESC")){if(c!=null)while(c.moveToNext())if("image/png".equals(c.getString(1))){exported=ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,c.getLong(0));break;}}if(exported!=null)break;SystemClock.sleep(200);}
             if(exported==null)throw new AssertionError("No exported PNG appeared in MediaStore");SystemClock.sleep(900);BitmapFactory.Options options=new BitmapFactory.Options();options.inJustDecodeBounds=true;try(InputStream stream=target.getContentResolver().openInputStream(exported)){BitmapFactory.decodeStream(stream,null,options);}if(options.outWidth!=800||options.outHeight!=15000)throw new AssertionError("UI export changed dimensions: "+options.outWidth+"x"+options.outHeight);capture("png-export-finished","Actual PNG export to gallery retained 800x15000 dimensions");
         });
@@ -161,10 +188,12 @@ public final class UiRunner extends Instrumentation {
             launch("com.cookies.editor.local.WelcomeActivity",null);capture("welcome","Actual redesigned welcome screen");SystemClock.sleep(900);capture("welcome-motion","Second actual animation frame");
             attempt("welcome-email-entry",()->{final Activity a=top;main(()->a.findViewById(0xc005).performClick());Dialog dialog=(Dialog)field(a,"authDialog");SystemClock.sleep(350);capture("local-sign-in-sheet","Opened the local email/password bottom sheet");main(()->{((EditText)dialog.findViewById(0xc001)).setText("ui-fixture@example.invalid");((EditText)dialog.findViewById(0xc002)).setText("cookies-ui-3481");dialog.findViewById(0xc003).requestRectangleOnScreen(new Rect(0,0,300,60),true);});capture("local-sign-up","Local email/password form; password masked");main(()->dialog.findViewById(0xc003).performClick());waitActivity("ProjectsActivity");capture("dashboard","Reached original dashboard through local profile");});
             attempt("editor-workflow",()->editorWorkflow());
+            attempt("native-smart-cleaner",()->cleanerCheck());
             screen("ui.library.FontLibraryActivity","font-library");screen("ui.library.ArabicFontsActivity","arabic-fonts");screen("ui.library.EnglishFontsActivity","english-fonts");screen("ui.library.ImportedFontsActivity","imported-fonts");screen("ui.floatingwidget.FolatingWidgetDashboard","floating-assistant");screen("ui.settings.SettingsActivity","settings-local-profile");
             attempt("tag-mini-editor",()->{Object tag=type(BASE+"ui.settings.TagItem").getConstructor(String.class,String.class,String.class,String.class).newInstance("حوار عربي","#حوار","#FFFFFF","bein_normal.ttf");Intent i=new Intent().putExtra("TAG_ITEM_DATA",(Serializable)tag);launch(BASE+"ui.editor.TagMiniEditorActivity",i);capture("tag-mini-editor","Opened original mini editor with a local tag");});
+            attempt("floating-window-service",()->overlayCheck());
             screen("ui.dashboard.StoreActivity","store-disabled-preview");screen("ui.community.CommunityActivity","community-disabled-preview");screen("ui.community.CreatePostActivity","create-post-disabled-preview");screen("ui.dashboard.WebtoonScraperActivity","webtoon-disabled-preview");
-            attempt("guest-entry",()->{launch("com.cookies.editor.local.WelcomeActivity",null);Activity a=top;main(()->a.findViewById(0xc004).performClick());waitActivity("ProjectsActivity");capture("guest-dashboard","Guest opened original local dashboard");});
+            attempt("guest-entry",()->{Intent reset=new Intent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);launch("com.cookies.editor.local.WelcomeActivity",reset);Activity a=top;main(()->a.findViewById(0xc004).performClick());waitActivity("ProjectsActivity");capture("guest-dashboard","Guest opened original local dashboard after resetting navigation task");});
         }catch(Throwable e){try{checks.put(new JSONObject().put("name","runner").put("status","fail").put("error",e.toString()));}catch(Exception ignored){}code=Activity.RESULT_CANCELED;}
         finally{
             try{int failures=0;for(int i=0;i<checks.length();i++)if("fail".equals(checks.getJSONObject(i).getString("status")))failures++;if(failures>0)code=Activity.RESULT_CANCELED;
