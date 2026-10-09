@@ -105,9 +105,27 @@ public final class UiRunner extends Instrumentation {
         target.getSharedPreferences("AshtyperPrefs",0).edit().putInt("TUTORIAL_MAIN_SHOWN",1).putBoolean("TUTORIAL_FLOATING",true).apply();
         launch(BASE+"ui.floatingwidget.FolatingWidgetDashboard",null);set("editText","هذا حوار عربي تجريبي\nوهذه فقاعة ثانية");capture("assistant-dialogue-input","Entered local dialogue text for the floating assistant");click("button");waitActivity("ProjectsActivity");SystemClock.sleep(1300);
         boolean running=false;for(ActivityManager.RunningServiceInfo service:((ActivityManager)target.getSystemService(Context.ACTIVITY_SERVICE)).getRunningServices(100))if(service.service.getClassName().endsWith("FloatingWidgetService"))running=true;
-        if(!running)throw new AssertionError("Original floating service did not start");capture("floating-window","Original floating service running above Cookies dashboard");
-        main(()->top.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS)));SystemClock.sleep(800);capture("floating-above-settings","Actual screenshot after opening Android Settings with the original overlay running");back();
-        Intent stop=new Intent().setClassName(target,BASE+"ui.floatingwidget.FloatingWidgetService");main(()->target.stopService(stop));SystemClock.sleep(400);
+        Intent stop=new Intent().setClassName(target,BASE+"ui.floatingwidget.FloatingWidgetService");
+        try{
+            if(!running)throw new AssertionError("Original floating service did not start");capture("floating-window","Original floating service running above Cookies dashboard");
+            // Android Settings deliberately hides third-party overlays. Test the
+            // actual launcher instead, and use UiAutomation for system input:
+            // Instrumentation.sendKeyDownUpSync only injects into our own UID.
+            android.accessibilityservice.AccessibilityServiceInfo info=getUiAutomation().getServiceInfo();
+            info.flags|=android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS;getUiAutomation().setServiceInfo(info);
+            long now=SystemClock.uptimeMillis();
+            if(!getUiAutomation().injectInputEvent(new KeyEvent(now,now,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_HOME,0),true)||!getUiAutomation().injectInputEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_UP,KeyEvent.KEYCODE_HOME,0),true))throw new AssertionError("Cannot open Android home");
+            SystemClock.sleep(1400);boolean externalWindow=false,overlayText=false;
+            for(android.view.accessibility.AccessibilityWindowInfo window:getUiAutomation().getWindows()){
+                android.view.accessibility.AccessibilityNodeInfo root=window.getRoot();if(root==null)continue;
+                String owner=String.valueOf(root.getPackageName());
+                if(!owner.equals(target.getPackageName())&&!owner.equals("com.android.systemui"))externalWindow=true;
+                if(owner.equals(target.getPackageName())&&!root.findAccessibilityNodeInfosByText("هذا حوار عربي").isEmpty())overlayText=true;
+                root.recycle();
+            }
+            if(!externalWindow||!overlayText)throw new AssertionError("Expected external launcher and visible dialogue overlay; external="+externalWindow+", overlay="+overlayText);
+            capture("floating-above-home","Verified separate launcher window and visible original Arabic dialogue overlay through accessibility, then captured the actual screen");
+        }finally{main(()->target.stopService(stop));SystemClock.sleep(400);launch(BASE+"ui.dashboard.ProjectsActivity",null);}
     }
     private Uri sourceImage()throws Exception{
         Bitmap b=Bitmap.createBitmap(800,15000,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);c.drawColor(Color.WHITE);Paint p=new Paint(3);
@@ -197,7 +215,7 @@ public final class UiRunner extends Instrumentation {
         }catch(Throwable e){try{checks.put(new JSONObject().put("name","runner").put("status","fail").put("error",e.toString()));}catch(Exception ignored){}code=Activity.RESULT_CANCELED;}
         finally{
             try{int failures=0;for(int i=0;i<checks.length();i++)if("fail".equals(checks.getJSONObject(i).getString("status")))failures++;if(failures>0)code=Activity.RESULT_CANCELED;
-                JSONObject report=new JSONObject().put("status",failures==0?"pass":"fail").put("screenshots",steps.length()).put("steps",steps).put("checks",checks).put("limitations",new JSONArray(Arrays.asList("Offline service screens are original-layout previews, not functioning cloud services","UI actions plus selected end-to-end flows; not every combination of properties","Paid feature entitlement checks retained","Native ARM-only operations may not execute on x86 emulator","No iPhone application tested")));
+                JSONObject report=new JSONObject().put("status",failures==0?"pass":"fail").put("screenshots",steps.length()).put("steps",steps).put("checks",checks).put("limitations",new JSONArray(Arrays.asList("Offline service screens are original-layout previews, not functioning cloud services","UI actions plus selected end-to-end flows; not every combination of properties","Paid feature entitlement checks retained","Original ARM OpenCV cleaner tested through emulator native translation; not every native operation","No iPhone application tested")));
                 write("ui-verification.json",report.toString(2));zip();result.putString("report",new File(out,"ui-verification.json").getAbsolutePath());result.putInt("screenshots",steps.length());result.putInt("failures",failures);
             }catch(Exception e){result.putString("error",e.toString());code=Activity.RESULT_CANCELED;}finish(code,result);
         }

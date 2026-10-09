@@ -18,7 +18,7 @@ TITLES={
     'export-selected':'تحديد صفحات التصدير','png-export-finished':'اكتمال تصدير PNG','tag-mini-editor':'محرر الوسوم المصغر',
     'arabic-fonts':'الخطوط العربية','english-fonts':'الخطوط الإنجليزية','imported-fonts':'الخطوط المخصصة',
     'floating-assistant':'المساعد العائم','settings-local-profile':'الإعدادات والملف المحلي',
-    'assistant-dialogue-input':'إدخال حوارات المساعد','floating-window':'النافذة العائمة داخل التطبيق','floating-above-settings':'النافذة العائمة فوق إعدادات أندرويد',
+    'assistant-dialogue-input':'إدخال حوارات المساعد','floating-window':'النافذة العائمة داخل التطبيق','floating-above-home':'النافذة العائمة فوق الشاشة الرئيسية لأندرويد',
     'store-disabled-preview':'المتجر — خدمة معطلة','community-disabled-preview':'المجتمع — خدمة معطلة',
     'create-post-disabled-preview':'إنشاء منشور — خدمة معطلة','webtoon-disabled-preview':'تنزيل ويبتون — خدمة معطلة',
     'guest-dashboard':'فتح المشاريع دون حساب',
@@ -36,6 +36,8 @@ def create(directory):
         label=title(s['screen']);disabled='disabled-preview' in s['screen']
         badge='خدمة معطلة' if disabled else 'لقطة فعلية'
         cards.append(f'<article><a href="{html.escape(s["file"])}" target="_blank"><img loading="lazy" src="{html.escape(s["file"])}" alt="{html.escape(label)}"></a><div class="caption"><span class="badge">{badge}</span><h2>{i+1:02d}. {html.escape(label)}</h2><details><summary>تفاصيل الخطوة</summary><p dir="ltr">{html.escape(s["operation"])}</p><p dir="ltr">{html.escape(s["activity"])}</p><a href="{html.escape(s["hierarchy"])}">عناصر الواجهة الملتقطة</a></details></div></article>')
+    for file,label in [('native-cleaner-before.png','قبل التنظيف الذكي'),('native-cleaner-mask.png','قناع منطقة التنظيف'),('native-cleaner-after.png','نتيجة محرك التنظيف الأصلي')]:
+        if (p/file).is_file():cards.append(f'<article><a href="{file}" target="_blank"><img loading="lazy" src="{file}" alt="{label}"></a><div class="caption"><span class="badge">اختبار محرك أصلي</span><h2>{label}</h2><a href="native-cleaner-verification.json">نتيجة الاختبار</a></div></article>')
     passed=sum(c['status']=='pass' for c in report['checks']);failed=sum(c['status']=='fail' for c in report['checks'])
     rows=''.join(f'<tr><td dir="ltr">{html.escape(c["name"])}</td><td class="{c["status"]}">{"نجح" if c["status"]=="pass" else "فشل"}</td><td dir="ltr">{html.escape(c.get("error",""))}</td></tr>' for c in report['checks'])
     document='''<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cookies Editor — صور الاختبار الفعلية</title><style>
